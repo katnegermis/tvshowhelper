@@ -1,0 +1,32 @@
+# deprecated
+def yesno(question):
+    print ""
+    print question
+    print "n: No"
+    print "y: Yes"
+    res = raw_input()
+    if not res.lower().startswith("y"):
+        return False
+    return True
+
+
+def multipleoptions(question, options, unwrapfunction=None, neither=True):
+    print ""
+    print question
+    print ""
+    for i, option in enumerate(options):
+        if unwrapfunction is not None:
+            option = unwrapfunction(option)
+        print "{}: {}".format(i + 1, option)
+    if neither:
+        print "0: None of the above"
+    # check that user inputs a number
+    res = None
+    while res is None:
+        try:
+            res = int(raw_input())
+        except ValueError:
+            print "Please only type a number"
+    if res == 0:
+        return None
+    return options[res - 1]
