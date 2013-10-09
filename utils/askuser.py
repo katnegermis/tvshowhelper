@@ -10,7 +10,7 @@ def yesno(question):
     return True
 
 
-def multipleoptions(question, options, unwrapfunction=None, neither=True):
+def multipleoptions(question, options, unwrapfunction=None, noneoption=True):
     print ""
     print question
     print ""
@@ -18,7 +18,7 @@ def multipleoptions(question, options, unwrapfunction=None, neither=True):
         if unwrapfunction is not None:
             option = unwrapfunction(option)
         print "{}: {}".format(i + 1, option)
-    if neither:
+    if noneoption:
         print "0: None of the above"
     # check that user inputs a number
     res = None
@@ -27,6 +27,9 @@ def multipleoptions(question, options, unwrapfunction=None, neither=True):
             res = int(raw_input())
         except ValueError:
             print "Please only type a number"
+        if res >= len(options):
+            res = None
+            print "Please choose a number within the range 1-{}".format(len(options) + 1)
     if res == 0:
         return None
     return options[res - 1]

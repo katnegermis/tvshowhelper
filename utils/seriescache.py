@@ -73,20 +73,20 @@ class SeriesCache:
         return season.getepisode(episodenumber)
 
     def saveshow(self, show):
-        self._shows[show.getname()] = show
+        self._shows[show.name] = show
         self._savecache(self._shows)
 
     def _saveepisodeproperties(self, showname, oldshow, newshow):
         if not isinstance(oldshow, Show):
             oldshow = self._dicttoshow(showname, oldshow)
-        for oldseason in oldshow.getseasons():
+        for oldseason in oldshow.seasons:
             if not newshow.hasseason(oldseason.getnumber()):
                 continue
             newseason = newshow.getseason(oldseason.getnumber())
             for oldepisode in oldseason.getepisodes():
-                if not newseason.hasepisode(oldepisode.getnumber()):
+                if not newseason.hasepisode(oldepisode.number):
                     continue
-                newepisode = newseason.getepisode(oldepisode.getnumber())
+                newepisode = newseason.getepisode(oldepisode.number)
                 newepisode.setproperties(**oldepisode.getproperties())
         return newshow
 
@@ -135,18 +135,13 @@ class SeriesCache:
         """ Convert show to a dictionary """
         obj = {'season': {}}
         obj['imdburl'] = show.getimdburl()
-        for season in show.getseasons():
+        for season in show.seasons:
             obj['season'][season.getnumber()] = {'episode': {}}
             for episode in season.getepisodes():
-                obj['season'][season.getnumber()]['episode'][episode.getnumber()] = {
-                    'name': episode.getname(),
-                    'watched': episode.getwatched(),
-                    'description': episode.getdescription(),
-                    'airdate': episode.getairdate()
+                obj['season'][season.getnumber()]['episode'][episode.number] = {
+                    'name': episode.name,
+                    'watched': episode.watched,
+                    'description': episode.description,
+                    'airdate': episode.airdate
                 }
         return obj
-
-if __name__ == '__main__':
-    cache = SeriesCache()
-    # log(str(cache.getepisode("How I Met Your Mother", 8, 21, True)))
-    # log(str(cache.getepisode("Lie to me", 2, 2)))

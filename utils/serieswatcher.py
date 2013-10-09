@@ -21,7 +21,6 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 sys.path.append(ROOT_DIR)
 import os
 import re
-from datetime import datetime
 
 from docopt import docopt
 
@@ -40,9 +39,9 @@ def watchnext(showname, update=False):
         return
     showname, season, episode = getnextepisode(showname, cache, update=update)
 
-    if watch(showname, season.getnumber(), episode.getnumber()):
+    if watch(showname, season.number, episode.number):
         if askuser.yesno("Should the episode be marked as watched?"):
-            markwatched(showname, season.getnumber(), episode.getnumber(), cache)
+            markwatched(showname, season.number, episode.number, cache)
 
 
 def watch(showname, seasonnumber, episodenumber):
@@ -61,14 +60,14 @@ def watch(showname, seasonnumber, episodenumber):
                 os.system("{} {}".format(conf.VIDEO_COMMAND, episodepath.replace(" ", "\ ")))
                 return True
     regex = findshow(showname)
-    showname = regex.getshowname()
+    showname = regex.showname
     cache = SeriesCache()
     episode = cache.getepisode(showname, seasonnumber, episodenumber)
     # if episode is not None:
     #     if datetime.strptime(re.sub('[\.,]', '', episode.getairdate()), "%b %d %Y") > datetime.now():
     #         print "{} S{}E{} hasn't aired yet! It will air {}".format(showname, seasonnumber, episodenumber, episode.getairdate())
     #         return False
-    question = "{} S{}E{} - {} wasn't found. Should we try to download it?".format(showname, seasonnumber, episodenumber, episode.getname())
+    question = "{} S{}E{} - {} wasn't found. Should we try to download it?".format(showname, seasonnumber, episodenumber, episode.name)
     if askuser.yesno(question):
         seriesdownloader.downloadshow(showname, seasonnumber, episodenumber)
         # use watchdog to perform surveillance
@@ -81,21 +80,21 @@ def getnextepisode(showname, cache=None, update=False):
     if cache is None:
         cache = SeriesCache()
     regex = findshow(showname)
-    showname = regex.getshowname()
+    showname = regex.showname
     show = cache.getshow(showname, update=update)
     nextepisode = None
     nextseason = None
-    for season in show.getseasons():
-        for episode in season.getepisodes():
-            if episode.watched():
+    for season in show.seasons:
+        for episode in season.episodes:
+            if episode.watched:
                 continue
             if nextepisode is None:
                 nextepisode = episode
             if nextseason is None:
                 nextseason = season
-            if (int(season.getnumber()) < int(nextseason.getnumber()) or
-                    int(season.getnumber()) == int(nextseason.getnumber()) and
-                    int(episode.getnumber()) < int(nextepisode.getnumber())):
+            if (int(season.number) < int(nextseason.number) or
+                    int(season.number) == int(nextseason.number) and
+                    int(episode.number) < int(nextepisode.number)):
                 nextepisode = episode
                 nextseason = season
 
@@ -107,7 +106,7 @@ def markwatched(showname, seasonnumber, episodenumber, markprevious=False, watch
         cache = SeriesCache()
     cache = SeriesCache()
     regex = findshow(showname)
-    showname = regex.getshowname()
+    showname = regex.showname
     show = cache.getshow(showname)
     if markprevious:
         _markpreviouswatched(show, seasonnumber, episodenumber, watched=watched)
@@ -117,14 +116,14 @@ def markwatched(showname, seasonnumber, episodenumber, markprevious=False, watch
 
 
 def _markpreviouswatched(show, seasonnumber, episodenumber, watched=True):
-    for season in show.getseasons():
-        if int(season.getnumber()) < int(seasonnumber):
-            for episode in season.getepisodes():
-                    episode.setwatched(watched)
-        elif int(season.getnumber()) == int(seasonnumber):
-            for episode in season.getepisodes():
-                if int(episode.getnumber()) <= int(episodenumber):
-                    episode.setwatched(watched)
+    for season in show.seasons:
+        if int(season.number) < int(seasonnumber):
+            for episode in season.episodes:
+                    episode.watched = watched
+        elif int(season.number) == int(seasonnumber):
+            for episode in season.episodes:
+                if int(episode.number) <= int(episodenumber):
+                    episode.watched = watched
 
 
 def _markwatched(show, seasonnumber, episodenumber, watched=True):
@@ -132,7 +131,7 @@ def _markwatched(show, seasonnumber, episodenumber, watched=True):
     if season is not None:
         episode = season.getepisode(episodenumber)
         if episode is not None:
-            episode.setwatched(watched)
+            episode.watched = watched
 
 
 if __name__ == '__main__':
@@ -148,7 +147,7 @@ if __name__ == '__main__':
         if None in [season, episode]:
             print "There are no more episodes in the cache! Try updating with the --update argument"
             sys.exit(0)
-        print "Next episode of {} is: S{}E{} (airdate {})".format(showname, season.getnumber(), episode.getnumber(), episode.getairdate())
+        print "Next episode of {} is: S{}E{} (airdate {})".format(showname, season.number, episode.number, episode.getairdate())
         sys.exit(0)
 
     if arguments['--mark-watched']:

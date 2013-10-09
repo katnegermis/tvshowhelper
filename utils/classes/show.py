@@ -1,26 +1,23 @@
 class Show(object):
 
     def __init__(self, name, imdburl=None):
-        self._name = name
-        self._imdburl = imdburl
-        self._seasons = []
+        self.name = name
+        self.imdburl = imdburl
+        self.seasons = []
 
     def __unicode__(self):
-        return unicode(self._name)
+        return unicode(self.name)
 
     def __repr__(self):
-        return self._name.encode('utf8')
+        return self.name.encode('utf8')
 
     def addseason(self, season):
         # check that season is an instance of Season
-        self._seasons.append(season)
-
-    def getseasons(self):
-        return self._seasons
+        self.seasons.append(season)
 
     def getseason(self, number):
         number = self._formatnumber(number)
-        for season in self._seasons:
+        for season in self.seasons:
             if number == season.getnumber():
                 return season
         return None
@@ -30,9 +27,3 @@ class Show(object):
 
     def _formatnumber(self, number):
         return str(number).zfill(2)
-
-    def getname(self):
-        return self._name
-
-    def getimdburl(self):
-        return self._imdburl
