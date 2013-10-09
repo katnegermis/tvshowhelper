@@ -1,22 +1,21 @@
-import sys
-sys.path.append("../..")
-
 import re
+from datetime import datetime
 
 import requests
 import lxml.html
 
-from utils import google
+from utils.informationscrapers import google
 from utils.classes.episode import Episode
 from utils.classes.season import Season
 from utils.classes.show import Show
+from settings import AIR_DATE_FORMAT
 
 
 def getshow(showname):
     imdburl = _getimdburl(showname)
     show = Show(name=showname, imdburl=imdburl)
     for season in getseasons(showname, imdburl=imdburl):
-        for episode in getepisodes(showname, season.getnumber(), imdburl=imdburl):
+        for episode in getepisodes(showname, season.number, imdburl=imdburl):
             season.addepisode(episode)
         show.addseason(season)
     return show
@@ -46,25 +45,32 @@ def getepisodes(showname, season, imdburl=None):
     doc = lxml.html.fromstring(html)
     episodes = []
     for episode in doc.cssselect("div.list_item"):
+        name = _fixname(episode.cssselect("strong a")[0].get('title'))
+        airdate = _fixairdate(episode.cssselect("div.airdate")[0].text_content().strip())
+        number = episode.cssselect("meta")[0].get("content")
+        description = episode.cssselect("div.item_description")[0].text_content().strip()
         episodes.append(
             Episode(
-                name=_fixname(episode.cssselect("strong a")[0].get('title')),
-                number=episode.cssselect("meta")[0].get("content"),
-                airdate=episode.cssselect("div.airdate")[0].text_content().strip(),
-                description=episode.cssselect("div.item_description")[0].text_content().strip()
+                name=name,
+                number=number,
+                airdate=airdate,
+                description=description,
             )
         )
     return episodes
 
 
 def _getimdburl(showname):
-    return google.getimdblink(showname)
+    print "GOOGLING NOW! {}"
+    return google.getimdblink("site:www.imdb.com {}".format(showname))
 
 
 def _getimdbepisodesurl(showname, imdburl=None):
+    print "IMDBURL: {}".format(imdburl)
     if imdburl is None:
         imdburl = _getimdburl(showname)
-    if not imdburl.endswith("/"):
+        print imdburl
+    if not imdburl is None and not imdburl.endswith("/"):
         imdburl += "/"
     return "{}episodes".format(imdburl)
 
@@ -95,3 +101,12 @@ def _fixname(name):
     if res is not None:  # there was a match
         name = None
     return name
+
+
+def _fixairdate(airdate):
+    if not re.match("\w{3}\.? \d+, \d+", airdate):
+        return "Jan. 01, 1990"
+    try:
+        return datetime.strptime(airdate, "%b. %d, %Y")
+    except ValueError:
+        return datetime.strptime(airdate, "%b %d, %Y")

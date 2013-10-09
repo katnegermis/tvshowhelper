@@ -23,3 +23,5 @@ DOWNLOADERS = (
     {'scraper': 'filestube',
      'downloader': 'jdownloader'},
 )
+
+AIR_DATE_FORMAT = "%b. %d, %Y"

@@ -17,6 +17,7 @@ def gethtml(query):
                             headers={'User-Agent': random.choice(USER_AGENTS)})
     return response.text
 
+
 def getimdblink(query):
     html = gethtml(query)
     links = lxml.html.fromstring(html).cssselect('h3.r a')

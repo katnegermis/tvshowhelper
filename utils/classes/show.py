@@ -18,7 +18,7 @@ class Show(object):
     def getseason(self, number):
         number = self._formatnumber(number)
         for season in self.seasons:
-            if number == season.getnumber():
+            if number == season.number:
                 return season
         return None
 

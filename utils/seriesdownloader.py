@@ -36,14 +36,14 @@ def _downloadshow(cache, showname, start):
     cache.getshow(showname)
     show = cache.getshow(showname)
     for season in show.seasons:
-        _downloadseason(cache, showname, season.getnumber(), start)
+        _downloadseason(cache, showname, season.number, start)
 
 
 def _downloadseason(cache, showname, seasonnumber, start):
     seasonnumber = str(seasonnumber).zfill(2)
     season = cache.getseason(showname, seasonnumber)
-    for episode in season.getepisodes():
-        _downloadepisode(showname, seasonnumber, episode.getnumber(), start)
+    for episode in season.episodes:
+        _downloadepisode(showname, seasonnumber, episode.number, start)
 
 
 def _downloadepisode(showname, seasonnumber, episodenumber, start):

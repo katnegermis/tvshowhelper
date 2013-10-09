@@ -1,12 +1,9 @@
-import re
-from datetime import datetime
-
 class Episode(object):
 
     def __init__(self, number, name=None, airdate=None, description=None, watched=False):
         self.number = self._formatnumber(number)
         self.name = name
-        self.airdate =  airdate
+        self.airdate = airdate
         self.description = description
         self.watched = watched
 
@@ -16,12 +13,12 @@ class Episode(object):
     def __repr__(self):
         return self.name
 
-    def getprettyname(self, showname, seasonnumber):
-        seasonnumber = str(seasonnumber).zfill(2)
+    def getprettyname(self, showname, seasonnum):
+        seasonnum = str(seasonnum).zfill(2)
         name = ""
         if self.name is not None:
             name = u" - {}".format(self.name)
-        return u"{} S{}E{}{}".format(showname, seasonnumber, str(self.number).zfill(2), name)
+        return u"{} S{}E{}{}".format(showname, seasonnum, self.number, name)
 
     def _formatnumber(self, number):
         return str(number).zfill(2)

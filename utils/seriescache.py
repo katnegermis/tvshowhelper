@@ -1,10 +1,10 @@
-import sys
-sys.path.append("..")
 import json
 import codecs
 import shutil
+from datetime import datetime
 
-import settings as conf
+# import settings as conf
+from settings import AIR_DATE_FORMAT, CACHE_FILE
 from utils.informationscrapers import imdb
 from utils.classes.show import Show
 from utils.classes.season import Season
@@ -15,7 +15,7 @@ def log(text):
     pass
 
 
-class SeriesCache:
+class SeriesCache(object):
     """ A dictionary of shows, with show names as keys.
     Each show is either serialized (an instance of Show) or not (a dictionary).
     Each show will be serialized before returned from this class.
@@ -50,40 +50,64 @@ class SeriesCache:
             self._shows[showname] = self._dicttoshow(showname, self._shows[showname])
         return self._shows[showname]
 
-    def getseason(self, showname, seasonnumber, update=False):
+    def getseason(self, showname, seasonnum, update=False):
         """ Retrieve a season from a show, from the cache.
         """
         show = self.getshow(showname, update=update)
         # make sure that the cache is up to date
-        if not show.hasseason(seasonnumber) and not update:
+        if not show.hasseason(seasonnum) and not update:
             show = self.getshow(showname, update=True)
-            if not show.hasseason(seasonnumber):
+            if not show.hasseason(seasonnum):
                 return None
-        return show.getseason(seasonnumber)
+        return show.getseason(seasonnum)
 
-    def getepisode(self, showname, seasonnumber, episodenumber, update=False):
+    def getepisode(self, showname, seasonnum, episodenum, update=False):
         """ Retrieve an episode from a season from a show, from the cache.
         """
-        season = self.getseason(showname, seasonnumber, update=update)
+        season = self.getseason(showname, seasonnum, update=update)
         # make sure that the cache is up to date
-        if (season is None or not season.hasepisode(episodenumber)) and not update:
-            season = self.getseason(showname, seasonnumber, update=True)
-            if season is None or not season.hasepisode(episodenumber):
+        if (season is None or not season.hasepisode(episodenum)) and not update:
+            season = self.getseason(showname, seasonnum, update=True)
+            if season is None or not season.hasepisode(episodenum):
                 return None
-        return season.getepisode(episodenumber)
+        return season.getepisode(episodenum)
 
     def saveshow(self, show):
         self._shows[show.name] = show
         self._savecache(self._shows)
 
+    def getnextepisode(self, showname):
+        show = self.getshow(showname)
+        nextepisode = None
+        nextseason = None
+        for season in show.seasons:
+            for episode in season.episodes:
+                if episode.watched:
+                    continue
+                if nextepisode is None:
+                    nextepisode = episode
+                if nextseason is None:
+                    nextseason = season
+                if (int(season.number) < int(nextseason.number) or
+                        int(season.number) == int(nextseason.number) and
+                        int(episode.number) < int(nextepisode.number)):
+                    nextepisode = episode
+                    nextseason = season
+        return nextseason, nextepisode
+
+    def markwatched(self, showname, seasonnum, episodenum, markprevious=False, watched=True):
+        show = self.getshow(showname)
+        # mark watched according to arguments
+        self.saveshow(show)
+
     def _saveepisodeproperties(self, showname, oldshow, newshow):
         if not isinstance(oldshow, Show):
             oldshow = self._dicttoshow(showname, oldshow)
         for oldseason in oldshow.seasons:
-            if not newshow.hasseason(oldseason.getnumber()):
+            if not newshow.hasseason(oldseason.number):
                 continue
-            newseason = newshow.getseason(oldseason.getnumber())
-            for oldepisode in oldseason.getepisodes():
+            newseason = newshow.getseason(oldseason.number)
+            for oldepisode in oldseason.episodes:
                 if not newseason.hasepisode(oldepisode.number):
                     continue
                 newepisode = newseason.getepisode(oldepisode.number)
@@ -93,21 +117,21 @@ class SeriesCache:
     def _readcache(self):
         log("reading cache")
         try:
-            with codecs.open(conf.CACHE_FILE, 'r', 'utf8') as f:
+            with codecs.open(CACHE_FILE, 'r', 'utf8') as f:
                 return json.loads(f.read())
         except (IOError, ValueError) as e:
-            log("{}.\n\"{}\".".format(e, conf.CACHE_FILE))
+            log("{}.\n\"{}\".".format(e, CACHE_FILE))
             return None
 
     def _savecache(self, shows):
         log("Saving cache")
         try:
-            with codecs.open(conf.CACHE_FILE + ".tmp", 'w+', 'utf8') as f:
+            with codecs.open(CACHE_FILE + ".tmp", 'w+', 'utf8') as f:
                 f.write(self._serializeshows(shows))
                 f.flush()
-            shutil.move(conf.CACHE_FILE + ".tmp", conf.CACHE_FILE)
+            shutil.move(CACHE_FILE + ".tmp", CACHE_FILE)
         except IOError:
-            log("Couldn't write to cache \"{}\"".format(conf.CACHE_FILE))
+            log("Couldn't write to cache \"{}\"".format(CACHE_FILE))
 
     def _serializeshows(self, shows):
         """ Serialize shows to json text """
@@ -117,31 +141,32 @@ class SeriesCache:
                 shows[showname] = self._showtodict(shows[showname])
         return json.dumps(shows, indent=4)
 
-    def _dicttoshow(self, showname, dictionary):
-        show = Show(name=showname, imdburl=dictionary['imdburl'])
-        for seasonnumber in dictionary['season']:
-            season = Season(number=seasonnumber, name="{} - {}".format(showname, seasonnumber))
+    def _dicttoshow(self, showname, dic):
+        show = Show(name=showname, imdburl=dic['imdburl'])
+        for seasonnum in dic['season']:
+            season = Season(number=seasonnum, name="{} - {}".format(showname, seasonnum))
             show.addseason(season)
-            for episodenumber in dictionary['season'][seasonnumber]['episode']:
-                episode = Episode(number=episodenumber,
-                                  name=dictionary['season'][seasonnumber]['episode'][episodenumber]['name'],
-                                  airdate=dictionary['season'][seasonnumber]['episode'][episodenumber]['airdate'],
-                                  description=dictionary['season'][seasonnumber]['episode'][episodenumber]['description'],
-                                  watched=dictionary['season'][seasonnumber]['episode'][episodenumber]['watched'])
+            for episodenum in dic['season'][seasonnum]['episode']:
+
+                episode = Episode(number=episodenum,
+                                  name=dic['season'][seasonnum]['episode'][episodenum]['name'],
+                                  airdate=datetime.strptime(dic['season'][seasonnum]['episode'][episodenum]['airdate'], AIR_DATE_FORMAT),
+                                  description=dic['season'][seasonnum]['episode'][episodenum]['description'],
+                                  watched=dic['season'][seasonnum]['episode'][episodenum]['watched'])
                 season.addepisode(episode)
         return show
 
     def _showtodict(self, show):
         """ Convert show to a dictionary """
         obj = {'season': {}}
-        obj['imdburl'] = show.getimdburl()
+        obj['imdburl'] = show.imdburl
         for season in show.seasons:
-            obj['season'][season.getnumber()] = {'episode': {}}
-            for episode in season.getepisodes():
-                obj['season'][season.getnumber()]['episode'][episode.number] = {
+            obj['season'][season.number] = {'episode': {}}
+            for episode in season.episodes:
+                obj['season'][season.number]['episode'][episode.number] = {
                     'name': episode.name,
                     'watched': episode.watched,
                     'description': episode.description,
-                    'airdate': episode.airdate
+                    'airdate': datetime.strftime(episode.airdate, AIR_DATE_FORMAT),
                 }
         return obj
