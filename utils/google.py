@@ -1,28 +1,30 @@
+import random
+
 import requests
-import json
+import lxml.html
 
 
-def search(search):
-    """
-    Uses the google api to perform a google search.
+# Stop using google api key and use the following instead.
+"""
+import random
+USER_AGENTS = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:11.0) Gecko/20100101 Firefox/11.0',
+               'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:22.0) Gecko/20100 101 Firefox/22.0'
+               'Mozilla/5.0 (Windows NT 6.1; rv:11.0) Gecko/20100101 Firefox/11.0',
+               'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_4) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',
+               'Mozilla/5.0 (Windows; Windows NT 6.1) AppleWebKit/536.5 (KHTML, like Gecko) Chrome/19.0.1084.46 Safari/536.5',)
+useragent = random.choice(USER_AGENTS)
+"""
 
-    Does not yet catch any exceptions. Bad.
-    """
+def gethtml(query):
+    query = query.replace(' ', '+')
+    response = requests.get('https://www.google.com/search?ie=utf-8&q={}'.format(query),
+                            headers={'User-Agent': random.choice(USER_AGENTS)})
+    return response.text
 
-    # both cx and key are personal, and belong to katnegermis
-    cx = "014236546466015831762:fwk6wyz_ku8"
-    key = "AIzaSyBk9ZmLPYDCqC5etOi1hT-Sir7FKNjrlm4"
-
-    url = ("https://www.googleapis.com/customsearch/v1?"
-           "key={0}&alt=json&cx={1}&q={2}".format(key, cx, search))
-    return json.loads(requests.get(url).text)
-
-
-def getimdblink(series):
-    try:
-        return search("{} series imdb".format(series))['items'][0]['link']
-    except KeyError:
-        raise Exception("You have probably used up your 100 daily searches!")
-
-if __name__ == '__main__':
-    print getimdblink("parks and recreation").encode('utf8')
+def getimdblink(query):
+    html = gethtml(query)
+    links = lxml.html.fromstring(html).cssselect('h3.r a')
+    if links == []:
+        return None
+    else:
+        return links[0].get('href')

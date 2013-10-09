@@ -16,7 +16,9 @@ Options:
 """
 
 import sys
-sys.path.append("/media/storage/Dropbox/Koding/python/series_everything")
+import os
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(ROOT_DIR)
 import os
 import re
 from datetime import datetime
@@ -30,13 +32,13 @@ import settings as conf
 import askuser
 
 
-def watchnext(showname):
+def watchnext(showname, update=False):
     cache = SeriesCache()
     regex = findshow(showname)
     if regex is None:
         print "No show by that name!"
         return
-    showname, season, episode = getnextepisode(showname, cache)
+    showname, season, episode = getnextepisode(showname, cache, update=update)
 
     if watch(showname, season.getnumber(), episode.getnumber()):
         if askuser.yesno("Should the episode be marked as watched?"):
@@ -46,7 +48,7 @@ def watchnext(showname):
 def watch(showname, seasonnumber, episodenumber):
     showpath = os.path.join(conf.SERIES_ROOT_FOLDER, showname)
     if not os.path.exists(showpath):
-        return False
+        os.mkdir(showpath)
     for filename in os.listdir(showpath):
         seasonnumbertmp, episodenumbertmp = getepisodeinfo(filename)
         if seasonnumbertmp is None or episodenumbertmp is None:
@@ -62,25 +64,25 @@ def watch(showname, seasonnumber, episodenumber):
     showname = regex.getshowname()
     cache = SeriesCache()
     episode = cache.getepisode(showname, seasonnumber, episodenumber)
-    if episode is not None:
-        if datetime.strptime(re.sub('[\.,]', '', episode.getairdate()), "%b %d %Y") > datetime.now():
-            print "{} S{}E{} hasn't aired yet! It will air {}".format(showname, seasonnumber, episodenumber, episode.getairdate())
-            return False
-    question = "{} S{}E{} wasn't found. Should we try to download it?".format(showname, seasonnumber, episodenumber)
+    # if episode is not None:
+    #     if datetime.strptime(re.sub('[\.,]', '', episode.getairdate()), "%b %d %Y") > datetime.now():
+    #         print "{} S{}E{} hasn't aired yet! It will air {}".format(showname, seasonnumber, episodenumber, episode.getairdate())
+    #         return False
+    question = "{} S{}E{} - {} wasn't found. Should we try to download it?".format(showname, seasonnumber, episodenumber, episode.getname())
     if askuser.yesno(question):
         seriesdownloader.downloadshow(showname, seasonnumber, episodenumber)
-        # use watchdog to surveillance
+        # use watchdog to perform surveillance
         # wait until there is a (video) file in downloads folder that matches the show and episode information.
         # wait until the file has been downloaded.
         # run seriesrenamer on it. then play a sound and ask user if he wants to play the file.
 
 
-def getnextepisode(showname, cache=None):
+def getnextepisode(showname, cache=None, update=False):
     if cache is None:
         cache = SeriesCache()
     regex = findshow(showname)
     showname = regex.getshowname()
-    show = cache.getshow(showname)
+    show = cache.getshow(showname, update=update)
     nextepisode = None
     nextseason = None
     for season in show.getseasons():
@@ -142,7 +144,10 @@ if __name__ == '__main__':
         showname = " ".join(showname)
 
     if arguments['--next-episode']:
-        showname, season, episode = getnextepisode(showname=showname, cache=cache)
+        showname, season, episode = getnextepisode(showname=showname, cache=cache, update=arguments['--update'])
+        if None in [season, episode]:
+            print "There are no more episodes in the cache! Try updating with the --update argument"
+            sys.exit(0)
         print "Next episode of {} is: S{}E{} (airdate {})".format(showname, season.getnumber(), episode.getnumber(), episode.getairdate())
         sys.exit(0)
 
@@ -156,4 +161,4 @@ if __name__ == '__main__':
                     episodenumber=episodenumber, markprevious=arguments['--mark-previous'],
                     watched=(not arguments['--unwatched']), cache=cache)
         sys.exit(0)
-    watchnext(showname)
+    watchnext(showname, update=arguments['--update'])

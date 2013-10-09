@@ -1,10 +1,10 @@
 import requests
 
 
-JDOWNLOADER_BASE_URL = "http://192.168.0.101:10025/"
+JDOWNLOADER_BASE_URL = "http://localhost:10025/"
 
 
-def download(link, start=False):
+def download(link, start=True):
     if start:
         url = JDOWNLOADER_BASE_URL + "/action/add/links/grabber0/start1/{}".format(" ".join(link.getlinks()))
     else:

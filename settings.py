@@ -7,14 +7,15 @@ from utils.classes.regex import Regex
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 SEASON_EPISODE_REGEX = re.compile("(s|se|season)(?P<season>\d{1,2})(e|ep|episode)(?P<episode>\d{1,2})", re.IGNORECASE)
-SEASON_EPISODE_REGEX_NASTY = re.compile("((?P<season>\d{1,2})(?P<episode>\d{1,2}))(?!(p|mb))", re.IGNORECASE)
+SEASON_EPISODE_EXTRAS = (
+    re.compile("((?P<season>\d{1,2})(?P<episode>\d{1,2}))(?!(p|mb))", re.IGNORECASE),
+)
 
 IF_NOT_SHOW_EXISTS_CREATE_FOLDER = True
 
 VIDEO_COMMAND = "vlc"
 
-# SERIES_ROOT_FOLDER = "/media/server_storage/film/Serier"
-SERIES_ROOT_FOLDER = "/media/server_storage/film/Serier"
+SERIES_ROOT_FOLDER = "/home/katnegermis/downloads"
 
 CACHE_FILE = os.path.join(ROOT_DIR, "data", "cache.json")
 
@@ -225,4 +226,10 @@ SERIES_REGEXES = [
 
     Regex(name="Hannibal",
           regex="(hannibal|hnb[^\w])"),
+
+    Regex(name="Continuum",
+          regex="(continuum)"),
+
+    Regex(name="The IT Crowd",
+          regex="(the)?.?it.?crowd"),
 ]

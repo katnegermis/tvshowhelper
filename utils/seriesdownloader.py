@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
 import sys
-sys.path.append("/media/storage/Dropbox/Koding/python/series_everything")
+import os
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.append(ROOT_DIR)
 
 from downloadscrapers import filestube
 from downloaders import jdownloader
