@@ -50,9 +50,3 @@ def _downloadepisode(showname, seasonnumber, episodenumber, start):
     episodenumber = str(episodenumber).zfill(2)
     query = "{} S{}E{}".format(showname, seasonnumber, episodenumber)
     download(query, start=start)
-
-if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        download(" ".join(sys.argv[1:]))
-    else:
-        downloadshow("Two and a Half Men", seasonnumber=10)
