@@ -1,11 +1,12 @@
 class Episode(object):
 
-    def __init__(self, number, name=None, airdate=None, description=None, watched=False):
+    def __init__(self, number, name=None, airdate=None, seasonnumber=None, description=None, watched=False):
         self.number = self._formatnumber(number)
         self.name = name
         self.airdate = airdate
         self.description = description
         self.watched = watched
+        self.seasonnumber = seasonnumber
 
     def __unicode__(self):
         return unicode(self.name)

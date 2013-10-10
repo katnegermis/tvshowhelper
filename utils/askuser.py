@@ -27,9 +27,9 @@ def multipleoptions(question, options, unwrapfunction=None, noneoption=True):
             res = int(raw_input())
         except ValueError:
             print "Please only type a number"
-        if res >= len(options):
+        if res > len(options):
             res = None
-            print "Please choose a number within the range 1-{}".format(len(options) + 1)
+            print "Please choose a number within the range 1-{}".format(len(options))
     if res == 0:
         return None
     return options[res - 1]

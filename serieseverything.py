@@ -13,7 +13,7 @@ Usage:
 Options:
   -h --help                     Show this screen.
   --watch-next                  Watch next episode.
-  --watch                       Watch specific episode (e.g. s01e05).
+  --watch <episode>             Watch specific episode (e.g. s01e05).
   --next-episode                Display next episode's information, e.g. 's01e05 - title (release date)'.
   --mark-watched <episode>      Episode info (e.g. s01e05). See mark-previous option.
   --mark-unwatched <episode>    Episode info (e.g. s01e05). See mark-previous option.
@@ -37,29 +37,31 @@ def main(args):
     showname = getshowname(" ".join(args['<showname>']))
     cache = SeriesCache()
 
-    if args.get('<episode>', False):
-        season, episode = getepisodeinfo(args['<episode>'])
-
     if args.get('--mark-previous', False):
         markprevious = args['--mark-previous']
 
     if args.get('--watch-next', False):
-        season, episode = cache.getnextepisode(showname)
-        watch(showname, season, episode, cache=cache)
+        episode = cache.getnextepisode(showname)
+        watch(showname, episode, cache=cache)
 
     elif args.get('--watch', False):
-        watch(showname, season, episode, cache=cache)
+        seasonnum, episodenum = getepisodeinfo(args['--watch'])
+        episode = cache.getepisode(showname, seasonnum, episodenum)
+        watch(showname, episode, cache=cache)
 
     elif args.get('--next-episode', False):
-        season, episode = cache.getnextepisode(showname)
-        epname = episode.getprettyname(showname=showname, seasonnum=season.number)
-        print "Next episode is: {}, ({})".format(epname, datetime.strftime(episode.airdate, AIR_DATE_FORMAT))
+        episode = cache.getnextepisode(showname)
+        epname = episode.getprettyname(showname=showname, seasonnum=episode.seasonnumber)
+        print "Next episode is: {} ({})".format(epname, datetime.strftime(episode.airdate, AIR_DATE_FORMAT))
 
     elif args.get('--mark-watched', False):
-        cache.markwatched(showname, season, episode, markprevious=markprevious, watched=True)
+        seasonnum, episodenum = getepisodeinfo(args['--mark-watched'])
+        episode = cache.getepisode(showname, seasonnum, episodenum)
+        cache.markwatched(showname, episode, markprevious=markprevious, watched=True)
 
     elif args.get('--mark-unwatched', False):
-        cache.markwatched(showname, season, episode, markprevious=markprevious, watched=False)
+        season, episode = getepisodeinfo(args['--mark-unwatched'])
+        cache.markwatched(showname, episode, markprevious=markprevious, watched=False)
 
     elif args.get('--download', False):
         pass

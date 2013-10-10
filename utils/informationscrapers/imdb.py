@@ -31,7 +31,7 @@ def getseasons(showname, imdburl=None):
     doc = lxml.html.fromstring(html)
     seasons = []
     for season in doc.cssselect("select#bySeason option"):
-        seasons.append(Season(name="", number=season.get('value')))
+        seasons.append(Season(name="", number=season.get('value').strip().zfill(2)))
     return seasons
 
 
@@ -55,6 +55,7 @@ def getepisodes(showname, season, imdburl=None):
                 number=number,
                 airdate=airdate,
                 description=description,
+                seasonnumber=season,
             )
         )
     return episodes
