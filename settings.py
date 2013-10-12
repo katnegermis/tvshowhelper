@@ -1,8 +1,6 @@
 import re
 import os
 
-from regexes import SERIES_REGEXES
-
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__))
 
 IF_NOT_SHOW_EXISTS_CREATE_FOLDER = True
@@ -20,8 +18,8 @@ SEASON_EPISODE_REGEX_EXTRAS = (
 )
 
 DOWNLOADERS = (
-    {'scraper': 'filestube',
-     'downloader': 'jdownloader'},
+    {'downloader': 'jdownloader',
+     'scrapers': ['filestube']},
 )
 
 AIR_DATE_FORMAT = "%b. %d, %Y"

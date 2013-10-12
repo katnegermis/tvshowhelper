@@ -14,12 +14,11 @@ class Episode(object):
     def __repr__(self):
         return self.name
 
-    def getprettyname(self, showname, seasonnum):
-        seasonnum = str(seasonnum).zfill(2)
+    def getprettyname(self, showname):
         name = ""
         if self.name is not None:
             name = u" - {}".format(self.name)
-        return u"{} S{}E{}{}".format(showname, seasonnum, self.number, name)
+        return u"{} S{}E{}{}".format(showname, self.seasonnumber, self.number, name)
 
     def _formatnumber(self, number):
         return str(number).zfill(2)

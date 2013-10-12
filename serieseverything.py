@@ -28,8 +28,9 @@ from datetime import datetime
 from docopt import docopt
 
 from utils.serieswatcher import watch
-from utils.seriesfilename import getepisodeinfo, getshowname
+from utils.seriesnamehandler import getepisodeinfo, getshowname
 from utils.seriescache import SeriesCache
+from utils.seriesdownloader import downloadshow
 from settings import AIR_DATE_FORMAT
 
 
@@ -37,8 +38,7 @@ def main(args):
     showname = getshowname(" ".join(args['<showname>']))
     cache = SeriesCache()
 
-    if args.get('--mark-previous', False):
-        markprevious = args['--mark-previous']
+    markprevious = args.get('--mark-previous', False)
 
     if args.get('--watch-next', False):
         episode = cache.getnextepisode(showname)
@@ -51,7 +51,7 @@ def main(args):
 
     elif args.get('--next-episode', False):
         episode = cache.getnextepisode(showname)
-        epname = episode.getprettyname(showname=showname, seasonnum=episode.seasonnumber)
+        epname = episode.getprettyname(showname=showname)
         print "Next episode is: {} ({})".format(epname, datetime.strftime(episode.airdate, AIR_DATE_FORMAT))
 
     elif args.get('--mark-watched', False):
@@ -64,7 +64,8 @@ def main(args):
         cache.markwatched(showname, episode, markprevious=markprevious, watched=False)
 
     elif args.get('--download', False):
-        pass
+        seasonnum, episodenum = getepisodeinfo(args['--download'])
+        downloadshow(showname, seasonnum, episodenum)
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='Series everything v 0.1')

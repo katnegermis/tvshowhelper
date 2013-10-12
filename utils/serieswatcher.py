@@ -2,7 +2,7 @@ import subprocess
 from datetime import datetime
 
 from settings import VIDEO_COMMAND, AIR_DATE_FORMAT
-from utils.seriesfilename import getepisodepath
+from utils.seriesnamehandler import getepisodepath
 from utils import askuser
 
 
@@ -11,7 +11,7 @@ def watch(showname, episode, cache=None):
     Will return True if the show was seen, False otherwise.
     """
     if episode is not None and episode.airdate > datetime.now():
-        print "{} S{}E{} hasn't aired yet! It will air {}".format(showname, episode.seasonnumber, episode.number,
+        print "{} S{}E{} hasn't aired yet! It will air {}.".format(showname, episode.seasonnumber, episode.number,
                                                                   datetime.strftime(episode.airdate, AIR_DATE_FORMAT))
         return False
 
@@ -23,7 +23,7 @@ def watch(showname, episode, cache=None):
     print "NOW WATCHING {}".format(episodepath)
     subprocess.call([VIDEO_COMMAND, episodepath],
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    if not askuser.yesno("Should the episode be marked as watched?"):
+    if not askuser.yesno("Should '{}' be marked as watched?".format(episode.getprettyname(showname))):
         return False
     return True
 
