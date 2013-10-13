@@ -8,7 +8,10 @@ Usage:
   serieseverything.py <showname>... --next-episode
   serieseverything.py <showname>... --list
   serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]
+  serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]
   serieseverything.py <showname>... --download <episode>
+  serieseverything.py --rename <filename>
+  serieseverything.py --new-episodes
 
 Options:
   -h --help                     Show this screen.
@@ -21,51 +24,82 @@ Options:
   --download <episode>          Download episode (e.g. s01e05).
   --download-next               Download episode (e.g. s01e05).
   --update                      Force an update of the series cache.
+  --new-episodes                List recently aired, unwatched episodes
+  --rename <filename>           Rename files [default: 'all'].
 """
 
 from datetime import datetime
+from os import listdir
 
 from docopt import docopt
 
-from utils.serieswatcher import watch
+from utils.serieswatcher import watchepisode
 from utils.seriesnamehandler import getepisodeinfo, getshowname
 from utils.seriescache import SeriesCache
-from utils.seriesdownloader import downloadshow
+from utils.seriesdownloader import downloadepisode
+from utils.seriesrenamer import renameepisode
 from settings import AIR_DATE_FORMAT
 
 
 def main(args):
-    showname = getshowname(" ".join(args['<showname>']))
     cache = SeriesCache()
-
-    markprevious = args.get('--mark-previous', False)
-
+    if args.get('<showname>', False):
+        showname = getshowname(" ".join(args['<showname>']))
     if args.get('--watch-next', False):
-        episode = cache.getnextepisode(showname)
-        watch(showname, episode, cache=cache)
-
+        watchnext(showname, cache)
     elif args.get('--watch', False):
-        seasonnum, episodenum = getepisodeinfo(args['--watch'])
-        episode = cache.getepisode(showname, seasonnum, episodenum)
-        watch(showname, episode, cache=cache)
-
+        watch(showname, cache, args['--watch'])
     elif args.get('--next-episode', False):
-        episode = cache.getnextepisode(showname)
-        epname = episode.getprettyname(showname=showname)
-        print "Next episode is: {} ({})".format(epname, datetime.strftime(episode.airdate, AIR_DATE_FORMAT))
-
+        nextepisode(showname, cache)
     elif args.get('--mark-watched', False):
-        seasonnum, episodenum = getepisodeinfo(args['--mark-watched'])
-        episode = cache.getepisode(showname, seasonnum, episodenum)
-        cache.markwatched(showname, episode, markprevious=markprevious, watched=True)
-
+        markwatched(showname, cache, watched=True,
+                    markprevious=args.get('--mark-previous', False))
     elif args.get('--mark-unwatched', False):
-        season, episode = getepisodeinfo(args['--mark-unwatched'])
-        cache.markwatched(showname, episode, markprevious=markprevious, watched=False)
-
+        markwatched(showname, cache, watched=True,
+                    markprevious=args.get('--mark-previous', True))
     elif args.get('--download', False):
-        seasonnum, episodenum = getepisodeinfo(args['--download'])
-        downloadshow(showname, seasonnum, episodenum)
+        download(showname, cache)
+    elif args.get('--rename', False):
+        rename(cache, args['--rename'])
+
+
+def watchnext(showname, cache):
+    episode = cache.getnextepisode(showname)
+    if watchepisode(episode, cache=cache):
+        cache.markwatched(episode)
+
+
+def watch(showname, cache, episodestring):
+    seasonnum, episodenum = getepisodeinfo(episodestring)
+    episode = cache.getepisode(showname, seasonnum, episodenum)
+    if watchepisode(episode, cache=cache):
+        cache.markwatched(episode)
+
+
+def nextepisode(showname, cache):
+    episode = cache.getnextepisode(showname)
+    epname = episode.getprettyname()
+    print u"Next episode is: {} ({})".format(epname, datetime.strftime(episode.airdate, AIR_DATE_FORMAT)).encode('utf8')
+
+
+def markwatched(showname, cache, markprevious, watched):
+    seasonnum, episodenum = getepisodeinfo(args['--mark-watched'])
+    episode = cache.getepisode(showname, seasonnum, episodenum)
+    cache.markwatched(episode, markprevious=markprevious, watched=watched)
+
+
+def download(showname, cache):
+    seasonnum, episodenum = getepisodeinfo(args['--download'])
+    episode = cache.getepisode(showname, seasonnum, episodenum)
+    downloadepisode(episode)
+
+
+def rename(cache, filename):
+    if filename == 'all':
+        renameepisode(listdir('.'), cache=cache)
+    else:
+        renameepisode([filename], cache=cache)
+
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='Series everything v 0.1')

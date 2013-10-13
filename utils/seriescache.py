@@ -95,22 +95,24 @@ class SeriesCache(object):
                     nextseason = season
         return nextepisode
 
-    def markwatched(self, showname, episode, markprevious=False, watched=True):
-        show = self.getshow(showname)
-        self._markepisode(showname, episode, markprevious, watched)
+    def markwatched(self, episode, markprevious=False, watched=True):
+        show = self.getshow(episode.showname)
+        self._markepisode(episode, markprevious, watched)
         self.saveshow(show)
 
-    def _markepisode(self, showname, episode, markprevious=False, watched=True):
-        show = self.getshow(showname)
+    def _markepisode(self, episode, markprevious=False, watched=True):
+        show = self.getshow(episode.showname)
         for season in show.seasons:
+            if int(season.number) > int(episode.seasonnumber):
+                continue
             if int(season.number) < int(episode.seasonnumber) and markprevious:
                 for ep in season.episodes:
-                        ep.watched = watched
-            elif int(season.number) == int(episode.seasonnumber):
+                    ep.watched = watched
+            if int(season.number) == int(episode.seasonnumber):
                 for ep in season.episodes:
                     if int(ep.number) < int(episode.number) and markprevious:
                         ep.watched = watched
-                    elif int(ep.number) == episode.number:
+                    if int(ep.number) == int(episode.number):
                         ep.watched = watched
 
     def _saveepisodeproperties(self, showname, oldshow, newshow):
@@ -166,7 +168,8 @@ class SeriesCache(object):
                                   airdate=datetime.strptime(dic['season'][seasonnum]['episode'][episodenum]['airdate'], AIR_DATE_FORMAT),
                                   description=dic['season'][seasonnum]['episode'][episodenum]['description'],
                                   watched=dic['season'][seasonnum]['episode'][episodenum]['watched'],
-                                  seasonnumber=seasonnum,)
+                                  seasonnumber=seasonnum,
+                                  showname=showname,)
                 season.addepisode(episode)
         return show
 

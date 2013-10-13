@@ -1,36 +1,29 @@
-#!/usr/bin/python
-
-import sys
-import os
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-sys.path.append(ROOT_DIR)
 import os
 import shutil
 
 import settings as conf
-from seriescache import SeriesCache
+from seriesnamehandler import getepisodeinfo, getshowname
 
 
-def rename(filenames):
-    cache = SeriesCache()
+def renameepisode(filenames, cache):
     for filename in filenames:
         print "Analyzing {}".format(filename)
         seasonnumber, episodenumber = getepisodeinfo(filename)
-        if seasonnumber is None or episodenumber is None:
+        if None in (seasonnumber, episodenumber):
             print "Couldn't find episode information!".format(filename)
+            continue
         else:
-            showregex = findshow(filename)
-            if showregex is None:
+            showname = getshowname(filename)
+            if showname is None:
                 print "Didn't match any series"
                 continue
-            showname = showregex.getshowname()
             print "Found to be part of {}".format(showname)
             episode = cache.getepisode(showname, seasonnumber, episodenumber)
             if episode is None:
                 print "Couldn't find any information on {} S{}E{}".format(showname, seasonnumber, episodenumber)
                 continue
             fileext = os.path.splitext(filename)[1]
-            newfilename = episode.getprettyname(showname=showname, seasonnumber=seasonnumber) + fileext
+            newfilename = episode.getprettyname() + fileext
             newfilename = newfilename.replace("/", "-").replace("'", "")
             print "Moving to {}".format(newfilename.encode('utf8'))
             _movefile(filename, newfilename, showname)

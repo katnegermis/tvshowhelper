@@ -1,12 +1,13 @@
 class Episode(object):
 
-    def __init__(self, number, name=None, airdate=None, seasonnumber=None, description=None, watched=False):
+    def __init__(self, number, showname=None, name=None, airdate=None, seasonnumber=None, description=None, watched=False):
         self.number = self._formatnumber(number)
         self.name = name
         self.airdate = airdate
         self.description = description
         self.watched = watched
         self.seasonnumber = seasonnumber
+        self.showname = showname
 
     def __unicode__(self):
         return unicode(self.name)
@@ -14,11 +15,11 @@ class Episode(object):
     def __repr__(self):
         return self.name
 
-    def getprettyname(self, showname):
+    def getprettyname(self):
         name = ""
         if self.name is not None:
             name = u" - {}".format(self.name)
-        return u"{} S{}E{}{}".format(showname, self.seasonnumber, self.number, name)
+        return u"{} S{}E{}{}".format(self.showname, self.seasonnumber, self.number, name)
 
     def _formatnumber(self, number):
         return str(number).zfill(2)

@@ -21,7 +21,6 @@ def getepisodeinfo(txt):
         epinfo = "S{}E{}".format(ep[0], ep[1])
         regexmatches.append((epinfo, res))
     if regexmatches == []:
-        print "Couldn't find episode information!"
         return None, None
 
     option = askuser.multipleoptions("Which episode numbering is correct? ({})".format(txt),

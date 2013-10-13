@@ -1,5 +1,7 @@
 class Link(object):
 
-    def __init__(self, title, links):
+    def __init__(self, title, uris):
         self.title = title
-        self.links = links
+        if not isinstance(uris, list):
+            uris = [uris]
+        self.uris = uris

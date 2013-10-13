@@ -1,12 +1,3 @@
-#!/usr/bin/python
-
-import sys
-import os
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-sys.path.append(ROOT_DIR)
-
-from downloaders import jdownloader
-from seriescache import SeriesCache
 from settings import DOWNLOADERS
 import askuser
 from importer import doimport, modulejoin
@@ -14,7 +5,13 @@ from importer import doimport, modulejoin
 DOWNLOADSCRAPERS_MODULE = modulejoin("utils", "downloadscrapers")
 DOWNLOADERS_MODULE = modulejoin("utils", "downloaders")
 
-def download(query, start=False):
+
+def downloadepisode(episode, start=True):
+    query = "{} S{}E{}".format(episode.showname, episode.seasonnumber, episode.number)
+    return _download(query, start=start)
+
+
+def _download(query, start=False):
     if len(DOWNLOADERS) == 1:
         downloadtype = DOWNLOADERS[0]
     else:
@@ -28,49 +25,25 @@ def download(query, start=False):
         scrapertype = askuser.multipleoptions("Which download scraper would you like to use?", downloadtype['scrapers'])
         scrapermodule = modulejoin(DOWNLOADSCRAPERS_MODULE, scrapertype, scrapertype.capitalize())
 
-    Scrapercls = doimport(scrapermodule)
+    try:
+        Scrapercls = doimport(scrapermodule)
+    except ImportError:
+        print "Couldn't import scraper '{}' ({})".format(scrapertype, scrapermodule)
     scraper = Scrapercls()
     links = scraper.getlinks(query)
-    print links
     downloadmodule = modulejoin(DOWNLOADERS_MODULE, downloadtype['downloader'], downloadtype['downloader'].capitalize())
-    Downloader = doimport(downloadmodule)
-    downloader = Downloader()
-    print downloader.download(link)
+    try:
+        Downloader = doimport(downloadmodule)
+    except ImportError:
+        print "Couldn't import downloader '{}' ({})".format(downloadtype, downloadmodule)
 
-    link = askuser.multipleoptions("Which file should we download?", links, lambda x: x.gettitle())
+    downloader = Downloader()
+
+    link = askuser.multipleoptions("Which file should we download?", links, lambda x: x.title)
     if link is None:
         print "No link chosen"
-        return
-    jdownloader.download(link, start)
-
-
-def downloadshow(showname, seasonnumber=None, episodenumber=None, start=False):
-    cache = SeriesCache()
-    if seasonnumber is None and episodenumber is None:
-        _downloadshow(cache, showname, start)
-    elif seasonnumber is not None and episodenumber is None:
-        _downloadseason(cache, showname, seasonnumber, start)
-    elif seasonnumber is not None and episodenumber is not None:
-        _downloadepisode(showname, seasonnumber, episodenumber, start)
-    else:
-        print "Error"
-
-
-def _downloadshow(cache, showname, start):
-    cache.getshow(showname)
-    show = cache.getshow(showname)
-    for season in show.seasons:
-        _downloadseason(cache, showname, season.number, start)
-
-
-def _downloadseason(cache, showname, seasonnumber, start):
-    seasonnumber = str(seasonnumber).zfill(2)
-    season = cache.getseason(showname, seasonnumber)
-    for episode in season.episodes:
-        _downloadepisode(showname, seasonnumber, episode.number, start)
-
-
-def _downloadepisode(showname, seasonnumber, episodenumber, start):
-    episodenumber = str(episodenumber).zfill(2)
-    query = "{} S{}E{}".format(showname, seasonnumber, episodenumber)
-    download(query, start=start)
+        return False
+    downloader.download(link)
+    # report progress
+    # use seriesrenamer when download complete
+    return True

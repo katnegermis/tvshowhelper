@@ -62,12 +62,10 @@ def getepisodes(showname, season, imdburl=None):
 
 
 def _getimdburl(showname):
-    print "GOOGLING NOW! {}"
     return google.getimdblink("site:www.imdb.com {}".format(showname))
 
 
 def _getimdbepisodesurl(showname, imdburl=None):
-    print "IMDBURL: {}".format(imdburl)
     if imdburl is None:
         imdburl = _getimdburl(showname)
         print imdburl
@@ -106,7 +104,7 @@ def _fixname(name):
 
 def _fixairdate(airdate):
     if not re.match("\w{3}\.? \d+, \d+", airdate):
-        return "Jan. 01, 1990"
+        return datetime.strptime("Jan. 01, 1990", "%b. %d, %Y")
     try:
         return datetime.strptime(airdate, "%b. %d, %Y")
     except ValueError:

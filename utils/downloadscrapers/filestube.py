@@ -11,7 +11,6 @@ class Filestube(LinkScraperInterface):
     _LINKS_PER_PAGE = 10
 
     def getlinks(self, query, numlinks=5, size=(100, 1500)):
-        # print "Searching for \"{}\" on filestube".format(query)
         query = query.replace(" ", "+")
         linkpages = []
         for i in range(1, ((numlinks / self._LINKS_PER_PAGE) + 1) + 1):  # important that integer division is used here.
@@ -33,9 +32,9 @@ class Filestube(LinkScraperInterface):
         links = []
         for result in results:
             try:
-                link = self._BASE_URL + result.cssselect("a.resultsLink")[0].get('href')
+                url = self._BASE_URL + result.cssselect("a.resultsLink")[0].get('href')
                 title = result.cssselect("a.resultsLink")[0].get('title')
-                links.append(Link(title=title, links=[link]))
+                links.append(Link(title=title, uris=url))
             except IndexError:
                 # there was no link on the page.
                 # this happens if the file is known to be removed from the filehost
@@ -43,7 +42,7 @@ class Filestube(LinkScraperInterface):
         return links
 
     def _linkpagegetlink(self, link):
-        html = requests.get(link.getlinks()[0]).text
+        html = requests.get(link.uris[0]).text
         doc = lxml.html.fromstring(html)
         links = doc.cssselect("pre#copy_paste_links")[0].text_content().strip("\"").strip().split()
-        return Link(title=link.gettitle(), links=links)
+        return Link(title=link.title, uris=links)

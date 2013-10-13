@@ -213,4 +213,7 @@ SERIES_REGEXES = (
 
     Regex(showname="The IT Crowd",
           regex="(the)?.?it.?crowd"),
+
+    Regex(showname="Peep Show",
+          regex="p(eep)?.?show"),
 )
