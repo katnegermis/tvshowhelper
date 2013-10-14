@@ -1,7 +1,7 @@
 import os
 import shutil
 
-import settings as conf
+from settings.settings import SERIES_ROOT_FOLDER, IF_NOT_SHOW_EXISTS_CREATE_FOLDER
 from seriesnamehandler import getepisodeinfo, getshowname
 
 
@@ -34,9 +34,9 @@ def _movefile(filename, newfilename, showname):
     if not os.path.exists(filename):
         print "{} doesn't exist. Would have moved to {}".format(filename, newfilename)
         return
-    showfolder = os.path.join(conf.SERIES_ROOT_FOLDER, showname)
+    showfolder = os.path.join(SERIES_ROOT_FOLDER, showname)
     if not os.path.exists(showfolder):
-        if conf.IF_NOT_SHOW_EXISTS_CREATE_FOLDER:
+        if IF_NOT_SHOW_EXISTS_CREATE_FOLDER:
             os.mkdir(showfolder)
         else:
             print "{} doesn't exist, and IF_NOT_SHOW_EXISTS_CREATE_FOLDER is set to false. Skipping file!"
