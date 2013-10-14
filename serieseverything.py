@@ -10,6 +10,7 @@ Usage:
   serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]
   serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]
   serieseverything.py <showname>... --download <episode>
+  serieseverything.py <showname>... --download-next <number>
   serieseverything.py --rename <filename>
   serieseverything.py --new-episodes
 
@@ -22,7 +23,7 @@ Options:
   --mark-unwatched <episode>    Episode info (e.g. s01e05). See mark-previous option.
   --mark-previous               Mark all previous episodes watched as well as the one specified [default: False].
   --download <episode>          Download episode (e.g. s01e05).
-  --download-next               Download episode (e.g. s01e05).
+  --download-next               Download episode (e.g. s01e05) [default: 1].
   --update                      Force an update of the series cache.
   --new-episodes                List recently aired, unwatched episodes.
   --rename <filename>           Rename file [default: 'all'].

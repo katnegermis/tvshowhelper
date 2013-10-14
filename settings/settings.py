@@ -9,7 +9,7 @@ VIDEO_COMMAND = "vlc"
 
 SERIES_ROOT_FOLDER = "/home/katnegermis/downloads"
 
-CACHE_FILE = os.path.join(ROOT_DIR, "data", "cache.json")
+CACHE_FILE = os.path.join(ROOT_DIR, "cache.json")
 
 SEASON_EPISODE_REGEX = re.compile("(s|se|season)(?P<season>\d{1,2})(e|ep|episode)(?P<episode>\d{1,2})", re.IGNORECASE)
 SEASON_EPISODE_REGEX_EXTRAS = (

@@ -1,3 +1,6 @@
+from time import sleep
+from subprocess import Popen, PIPE
+
 import requests
 
 from interface import DownloaderInterface
@@ -16,7 +19,9 @@ class Jdownloader(DownloaderInterface):
         requests.get(url)
 
     def _running(self):
-        return True
+        return False
 
     def _start(self):
-        pass
+        print "Starting JDownloader..."
+        Popen(['jdownloader'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        sleep(10)
