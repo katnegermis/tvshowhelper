@@ -24,8 +24,8 @@ Options:
   --download <episode>          Download episode (e.g. s01e05).
   --download-next               Download episode (e.g. s01e05).
   --update                      Force an update of the series cache.
-  --new-episodes                List recently aired, unwatched episodes
-  --rename <filename>           Rename files [default: 'all'].
+  --new-episodes                List recently aired, unwatched episodes.
+  --rename <filename>           Rename file [default: 'all'].
 """
 
 from datetime import datetime
@@ -38,7 +38,7 @@ from utils.seriesnamehandler import getepisodeinfo, getshowname
 from utils.seriescache import SeriesCache
 from utils.seriesdownloader import downloadepisode
 from utils.seriesrenamer import renameepisode
-from settings import AIR_DATE_FORMAT
+from settings.settings import AIR_DATE_FORMAT
 
 
 def main(args):
@@ -65,14 +65,14 @@ def main(args):
 
 def watchnext(showname, cache):
     episode = cache.getnextepisode(showname)
-    if watchepisode(episode, cache=cache):
+    if watchepisode(episode):
         cache.markwatched(episode)
 
 
 def watch(showname, cache, episodestring):
     seasonnum, episodenum = getepisodeinfo(episodestring)
     episode = cache.getepisode(showname, seasonnum, episodenum)
-    if watchepisode(episode, cache=cache):
+    if watchepisode(episode):
         cache.markwatched(episode)
 
 

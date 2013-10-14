@@ -1,8 +1,7 @@
 import os
 
-from settings import SEASON_EPISODE_REGEX, SEASON_EPISODE_REGEX_EXTRAS
-from settings import SERIES_ROOT_FOLDER
-from regexes import SERIES_REGEXES
+from settings.settings import SEASON_EPISODE_REGEX, SEASON_EPISODE_REGEX_EXTRAS, SERIES_ROOT_FOLDER
+from settings.regexes import SERIES_REGEXES
 import askuser
 
 

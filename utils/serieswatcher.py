@@ -1,13 +1,13 @@
 import subprocess
 from datetime import datetime
 
-from settings import VIDEO_COMMAND, AIR_DATE_FORMAT
+from settings.settings import VIDEO_COMMAND, AIR_DATE_FORMAT
 from seriesnamehandler import getepisodepath
 from seriesdownloader import downloadepisode
 from utils import askuser
 
 
-def watchepisode(episode, cache=None):
+def watchepisode(episode):
     """ Watch a specific episode from the show showname.
     Will return True if the show was seen, False otherwise.
     """
@@ -15,7 +15,6 @@ def watchepisode(episode, cache=None):
         print "{} S{}E{} hasn't aired yet! It will air {}.".format(episode.showname, episode.seasonnumber, episode.number,
                                                                    datetime.strftime(episode.airdate, AIR_DATE_FORMAT))
         return False
-
     episodepath = getepisodepath(episode.showname, episode)
     if episodepath is None:
         _doesntexist_shoulddownload(episode)

@@ -8,7 +8,6 @@ from utils.informationscrapers import google
 from utils.classes.episode import Episode
 from utils.classes.season import Season
 from utils.classes.show import Show
-from settings import AIR_DATE_FORMAT
 
 
 def getshow(showname):
@@ -56,6 +55,7 @@ def getepisodes(showname, season, imdburl=None):
                 airdate=airdate,
                 description=description,
                 seasonnumber=season,
+                showname=showname,
             )
         )
     return episodes

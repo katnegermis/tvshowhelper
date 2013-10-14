@@ -3,8 +3,7 @@ import codecs
 import shutil
 from datetime import datetime
 
-# import settings as conf
-from settings import AIR_DATE_FORMAT, CACHE_FILE
+from settings.settings import AIR_DATE_FORMAT, CACHE_FILE
 from utils.informationscrapers import imdb
 from utils.classes.show import Show
 from utils.classes.season import Season
