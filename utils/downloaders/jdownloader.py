@@ -2,6 +2,7 @@ from time import sleep
 from subprocess import Popen, PIPE
 
 import requests
+import requests.exceptions
 
 from interface import DownloaderInterface
 
@@ -16,12 +17,15 @@ class Jdownloader(DownloaderInterface):
             url = self._JDOWNLOADER_BASE_URL + "/action/add/links/grabber0/start1/{}".format(" ".join(link.uris))
         else:
             url = self._JDOWNLOADER_BASE_URL + "/action/add/links/grabber1/start0/{}".format(" ".join(link.uris))
-        requests.get(url)
+        try:
+            requests.get(url)
+        except requests.exceptions.ConnectionError:
+            print "JDownloader doesn't seem to be running. Please open it and try again!"
 
     def _running(self):
-        return False
+        return True
 
     def _start(self):
         print "Starting JDownloader..."
-        Popen(['jdownloader'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
-        sleep(10)
+        Popen(['jdownloader', '&'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        sleep(20)
