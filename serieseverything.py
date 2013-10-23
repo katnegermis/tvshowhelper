@@ -2,31 +2,31 @@
 """Series everything
 
 Usage:
-  serieseverything.py <showname>... --watch-next
-  serieseverything.py <showname>... --update
-  serieseverything.py <showname>... --watch <episode>
-  serieseverything.py <showname>... --next-episode
-  serieseverything.py <showname>... --list
-  serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]
-  serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]
-  serieseverything.py <showname>... --download <episode>
-  serieseverything.py <showname>... --download-next <number>
-  serieseverything.py --rename <filename>
-  serieseverything.py --new-episodes
+    serieseverything.py <showname>... --watch-next
+    serieseverything.py <showname>... --update
+    serieseverything.py <showname>... --watch <episode>
+    serieseverything.py <showname>... --next-episode
+    serieseverything.py <showname>... --list
+    serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]
+    serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]
+    serieseverything.py <showname>... --download <episode>
+    serieseverything.py <showname>... --download-next <number>
+    serieseverything.py --rename <filename>
+    serieseverything.py --new-episodes
 
 Options:
-  -h --help                     Show this screen.
-  --watch-next                  Watch next episode.
-  --watch <episode>             Watch specific episode (e.g. s01e05).
-  --next-episode                Display next episode's information, e.g. 's01e05 - title (release date)'.
-  --mark-watched <episode>      Episode info (e.g. s01e05). See mark-previous option.
-  --mark-unwatched <episode>    Episode info (e.g. s01e05). See mark-previous option.
-  --mark-previous               Mark all previous episodes watched as well as the one specified [default: False].
-  --download <episode>          Download episode (e.g. s01e05).
-  --download-next               Download episode (e.g. s01e05) [default: 1].
-  --update                      Force an update of the series cache.
-  --new-episodes                List recently aired, unwatched episodes.
-  --rename <filename>           Rename file [default: 'all'].
+    -h --help                     Show this screen.
+    --watch-next                  Watch next episode.
+    --watch <episode>             Watch specific episode (e.g. s01e05).
+    --next-episode                Display next episode's information, e.g. 's01e05 - title (release date)'.
+    --mark-watched <episode>      Episode info (e.g. s01e05). See mark-previous option.
+    --mark-unwatched <episode>    Episode info (e.g. s01e05). See mark-previous option.
+    --mark-previous               Mark all previous episodes watched as well as the one specified [default: False].
+    --download <episode>          Download episode (e.g. s01e05).
+    --download-next               Download episode (e.g. s01e05) [default: 1].
+    --update                      Force an update of the series cache.
+    --new-episodes                List recently aired, unwatched episodes.
+    --rename <filename>           Rename file [default: 'all'].
 """
 
 from datetime import datetime
@@ -53,15 +53,19 @@ def main(args):
     elif args.get('--next-episode', False):
         nextepisode(showname, cache)
     elif args.get('--mark-watched', False):
-        markwatched(showname, cache, watched=True,
+        markwatched(showname, cache, args['--mark-watched'], watched=True,
                     markprevious=args.get('--mark-previous', False))
     elif args.get('--mark-unwatched', False):
-        markwatched(showname, cache, watched=True,
-                    markprevious=args.get('--mark-previous', True))
+        markwatched(showname, cache, args['--mark-unwatched'], watched=False,
+                    markprevious=args.get('--mark-previous', False))
     elif args.get('--download', False):
         download(showname, cache)
+    elif args.get('--update', False):
+        update(showname, cache)
     elif args.get('--rename', False):
         rename(cache, args['--rename'])
+    else:
+        print('Unimplemented/unknown arguments! {}'.format(args))
 
 
 def watchnext(showname, cache):
@@ -79,12 +83,13 @@ def watch(showname, cache, episodestring):
 
 def nextepisode(showname, cache):
     episode = cache.getnextepisode(showname)
-    epname = episode.getprettyname()
-    print u"Next episode is: {} ({})".format(epname, datetime.strftime(episode.airdate, AIR_DATE_FORMAT)).encode('utf8')
+    print u"Next episode is: {} ({}): {}".format(episode.getprettyname(),
+                                                 datetime.strftime(episode.airdate, AIR_DATE_FORMAT),
+                                                 episode.description).encode('utf8')
 
 
-def markwatched(showname, cache, markprevious, watched):
-    seasonnum, episodenum = getepisodeinfo(args['--mark-watched'])
+def markwatched(showname, cache, episodestring, markprevious, watched):
+    seasonnum, episodenum = getepisodeinfo(episodestring)
     episode = cache.getepisode(showname, seasonnum, episodenum)
     cache.markwatched(episode, markprevious=markprevious, watched=watched)
 
@@ -100,6 +105,10 @@ def rename(cache, filename):
         renameepisode(listdir('.'), cache=cache)
     else:
         renameepisode([filename], cache=cache)
+
+
+def update(showname, cache):
+    cache.getshow(showname, update=True)
 
 
 if __name__ == '__main__':
