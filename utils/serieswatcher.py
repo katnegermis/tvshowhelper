@@ -23,6 +23,7 @@ def watchepisode(episode):
     print "NOW WATCHING {}".format(episodepath)
     subprocess.call([VIDEO_COMMAND, episodepath],
                     stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # After episode has been watched, tell user of airdate/episode name of next episode
     if not askuser.yesno("Should '{}' be marked as watched?".format(episode.getprettyname())):
         return False
     return True
