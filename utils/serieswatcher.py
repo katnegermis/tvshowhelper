@@ -30,6 +30,6 @@ def watchepisode(episode):
 
 
 def _doesntexist_shoulddownload(episode):
-    question = "The {} S{}E{} wasn't found. Would you try to download it?".format(episode.showname, episode.seasonnumber, episode.number)
+    question = "{name} ({airdate}) wasn't found. Would you try to download it?".format(name=episode.getprettyname(), airdate=episode.airdate)
     if askuser.yesno(question):
         downloadepisode(episode)
