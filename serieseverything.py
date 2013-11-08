@@ -11,22 +11,22 @@ Usage:
     serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]
     serieseverything.py <showname>... --download <episode>
     serieseverything.py <showname>... --download-next <number>
-    serieseverything.py --rename <filename>
+    serieseverything.py <filename>... --rename
     serieseverything.py --new-episodes
 
 Options:
-    -h --help                     Show this screen.
-    --watch-next                  Watch next episode.
-    --watch <episode>             Watch specific episode (e.g. s01e05).
-    --next-episode                Display next episode's information, e.g. 's01e05 - title (release date)'.
-    --mark-watched <episode>      Episode info (e.g. s01e05). See mark-previous option.
-    --mark-unwatched <episode>    Episode info (e.g. s01e05). See mark-previous option.
-    --mark-previous               Mark all previous episodes watched as well as the one specified [default: False].
-    --download <episode>          Download episode (e.g. s01e05).
-    --download-next               Download episode (e.g. s01e05) [default: 1].
-    --update                      Force an update of the series cache.
-    --new-episodes                List recently aired, unwatched episodes.
-    --rename <filename>           Rename file [default: 'all'].
+    --help -h                       Show this screen.
+    --watch-next -w                 Watch next episode.
+    --watch <episode>               Watch specific episode (e.g. s01e05).
+    --next-episode -n               Display next episode's information, e.g. 's01e05 - title (release date)'.
+    --mark-watched <episode> -m     Episode info (e.g. s01e05). See mark-previous option.
+    --mark-unwatched <episode> -u   Episode info (e.g. s01e05). See mark-previous option.
+    --mark-previous -p              Mark all previous episodes watched as well as the one specified [default: False].
+    --download <episode> -d         Download episode (e.g. s01e05).
+    --download-next                 Download episode (e.g. s01e05) [default: 1].
+    --update -u                     Force an update of the series cache.
+    --new-episodes                  List recently aired, unwatched episodes.
+    --rename -r                     Rename file [default: 'all'].
 """
 
 from datetime import datetime
@@ -62,20 +62,24 @@ def main(args):
         download(showname, cache)
     elif args.get('--update', False):
         update(showname, cache)
-    elif args.get('--rename', False):
-        rename(cache, args['--rename'])
+    elif args.get('--rename', False) and args.get('<filename>', False):
+        rename(cache, args['<filename>'])
     else:
         print('Unimplemented/unknown arguments! {}'.format(args))
 
 
 def watchnext(showname, cache):
     episode = cache.getnextepisode(showname)
+    if episode is None:
+        print "Couldn't find any new episodes!"
+        return
     if watchepisode(episode):
         cache.markwatched(episode)
 
 
 def watch(showname, cache, episodestring):
     seasonnum, episodenum = getepisodeinfo(episodestring)
+    assert(seasonnum is not None and episodenum is not None)
     episode = cache.getepisode(showname, seasonnum, episodenum)
     if watchepisode(episode):
         cache.markwatched(episode)
@@ -100,11 +104,11 @@ def download(showname, cache):
     downloadepisode(episode)
 
 
-def rename(cache, filename):
-    if filename == 'all':
-        renameepisode(listdir('.'), cache=cache)
-    else:
-        renameepisode([filename], cache=cache)
+def rename(cache, filenames):
+    if not isinstance(filenames, list) and filenames == "all":
+        filenames = listdir('.')
+    for filename in filenames:
+        renameepisode(filename, cache=cache)
 
 
 def update(showname, cache):
