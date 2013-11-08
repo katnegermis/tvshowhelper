@@ -36,6 +36,7 @@ class Filestube(LinkScraperInterface):
                 title = result.cssselect("a.resultsLink")[0].get('title')
                 links.append(Link(title=title, uris=url))
             except IndexError:
+                print "there was no link on the page"
                 # there was no link on the page.
                 # this happens if the file is known to be removed from the filehost
                 continue
