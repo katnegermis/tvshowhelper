@@ -8,10 +8,11 @@ from utils import askuser
 
 
 def watchepisode(episode):
-    """ Watch a specific episode from the show showname.
+    """ Watch episode.
     Will return True if the show was seen, False otherwise.
     """
-    if episode is not None and episode.airdate > datetime.now():
+    assert(episode is not None)
+    if episode.airdate > datetime.now():
         print "{} S{}E{} hasn't aired yet! It will air {}.".format(episode.showname, episode.seasonnumber, episode.number,
                                                                    datetime.strftime(episode.airdate, AIR_DATE_FORMAT))
         return False
