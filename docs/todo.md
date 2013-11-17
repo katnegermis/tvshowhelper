@@ -19,5 +19,5 @@ General
 ---------
 
 - Use assertions where applicaple
-- Use python's own argparser instead of docopt
+- Use python's own argparser instead of docopt??
 - Use a virtualenv (at least for py3)
