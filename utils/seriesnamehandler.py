@@ -1,6 +1,7 @@
 import os
 
-from settings.settings import SEASON_EPISODE_REGEX, SEASON_EPISODE_REGEX_EXTRAS, SERIES_ROOT_FOLDER
+from settings.settings import (SEASON_EPISODE_REGEX, SEASON_EPISODE_REGEX_EXTRAS, SERIES_ROOT_FOLDER,
+                               SERIES_DOWNLOAD_FOLDER, SEARCH_DOWNLOAD_FOLDER)
 from settings.regexes import SERIES_REGEXES
 import askuser
 
@@ -44,15 +45,19 @@ def getshowname(txt):
 
 def getepisodepath(showname, episode):
     showpath = os.path.join(SERIES_ROOT_FOLDER, showname)
-    if not os.path.exists(showpath):
-        return None
 
-    for filename in os.listdir(showpath):  # perhaps do listdir with predefined file-extensions? mp4, mkv, avi
-        seasonnumtmp, episodenumtmp = getepisodeinfo(filename)
-        if seasonnumtmp is None or episodenumtmp is None:
+    searchdirs = [showpath]
+    if SEARCH_DOWNLOAD_FOLDER:
+        searchdirs.append(SERIES_DOWNLOAD_FOLDER)
+    for searchdir in searchdirs:
+        if not os.path.exists(searchdir):
             continue
-        if (episode.seasonnumber == seasonnumtmp and episode.number == episodenumtmp):
-            return os.path.join(showpath, filename)
+        for filename in os.listdir(searchdir):  # perhaps do listdir with predefined file-extensions? mp4, mkv, avi
+            seasonnumtmp, episodenumtmp = getepisodeinfo(filename)
+            if seasonnumtmp is None or episodenumtmp is None:
+                continue
+            if (episode.seasonnumber == seasonnumtmp and episode.number == episodenumtmp):
+                return os.path.join(searchdir, filename)
     return None
 
 

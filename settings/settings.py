@@ -10,6 +10,12 @@ CACHE_FILE = os.path.join(ROOT_DIR, "cache.json")
 """ TV-series root folder. """
 SERIES_ROOT_FOLDER = "/home/katnegermis/downloads"
 
+""" Folder where series are downloaded to. """
+SERIES_DOWNLOAD_FOLDER = "/home/katnegermis/downloads"
+
+""" Should the download folder be searched for episodes to watch? """
+SEARCH_DOWNLOAD_FOLDER = True
+
 """ If this is set to true, a folder with the series' name will be created in
 SERIES_ROOT_FOLDER, in case it doesn't exist, wherein all files of that series
 will be placed."""
