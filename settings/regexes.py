@@ -29,7 +29,7 @@ SERIES_REGEXES = (
           regex="(greys.?anatomy|grys.?antmy|gry.?anatm|g\\.a[^a-z]|GA[^a-z]|grey.?s.?anatomy)"),
 
     Regex(showname="Breaking Bad",
-          regex="(breaking.?bad|break.?bad|bb(s)?|brkng_bd)"),
+          regex="(breaking.?bad|break.?bad|(?!\w)bbs?|brkng_bd)"),
 
     Regex(showname="Entourage",
           regex="(entourage|entrge)"),
