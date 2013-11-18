@@ -40,7 +40,7 @@ def getshowname(txt):
         match = askuser.multipleoptions(question, matches, lambda x: x.showname)
     else:
         match = None
-    return match.showname
+    return match.showname if match else None
 
 
 def getepisodepath(showname, episode):
@@ -52,7 +52,9 @@ def getepisodepath(showname, episode):
     for searchdir in searchdirs:
         if not os.path.exists(searchdir):
             continue
-        for filename in os.listdir(searchdir):  # perhaps do listdir with predefined file-extensions? mp4, mkv, avi
+        for filename in os.listdir(searchdir):  # perhaps do listdir with specific file-extensions only?
+            if showname != getshowname(filename):
+                continue
             seasonnumtmp, episodenumtmp = getepisodeinfo(filename)
             if seasonnumtmp is None or episodenumtmp is None:
                 continue
