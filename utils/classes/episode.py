@@ -1,3 +1,7 @@
+from datetime import datetime
+from settings import AIR_DATE_FORMAT
+
+
 class Episode(object):
 
     def __init__(self, number, showname=None, name=None, airdate=None, seasonnumber=None, description=None, watched=False):
@@ -8,6 +12,7 @@ class Episode(object):
         self.watched = watched
         self.seasonnumber = seasonnumber
         self.showname = showname
+        self.aired = self.airdate < datetime.now()
 
     def __unicode__(self):
         return unicode(self.name)
@@ -20,6 +25,9 @@ class Episode(object):
         if self.name is not None:
             name = u" - {}".format(self.name)
         return u"{} S{}E{}{}".format(self.showname, self.seasonnumber, self.number, name)
+
+    def getairdatestr(self):
+        return datetime.strftime(self.airdate, AIR_DATE_FORMAT)
 
     def _formatnumber(self, number):
         return str(number).zfill(2)

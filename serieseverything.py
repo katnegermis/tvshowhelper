@@ -88,8 +88,7 @@ def watch(showname, cache, episodestring):
 def nextepisode(showname, cache):
     episode = cache.getnextepisode(showname)
     print u"Next episode is: {} ({}): {}".format(episode.getprettyname(),
-                                                 datetime.strftime(episode.airdate, AIR_DATE_FORMAT),
-                                                 episode.description).encode('utf8')
+                                                 episode.getairdatestr()).encode('utf8')
 
 
 def markwatched(showname, cache, episodestring, markprevious, watched):
