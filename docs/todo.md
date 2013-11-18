@@ -5,14 +5,7 @@ Testing
 ---------
 
 - Test one module at a time
-- Mocking
 - Unit testing
-
-
-Logging
----------
-
-- Use the logging-module instead of print statements
 
 
 General
