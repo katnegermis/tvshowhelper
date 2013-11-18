@@ -5,6 +5,7 @@ import requests
 import requests.exceptions
 
 from interface import DownloaderInterface
+from utils import logger
 
 
 class Jdownloader(DownloaderInterface):
@@ -20,12 +21,12 @@ class Jdownloader(DownloaderInterface):
         try:
             requests.get(url)
         except requests.exceptions.ConnectionError:
-            print "JDownloader doesn't seem to be running. Please open it and try again!"
+            logger.warning("JDownloader doesn't seem to be running. Please open it and try again!")
 
     def _running(self):
         return True
 
     def _start(self):
-        print "Starting JDownloader..."
+        logger.info("Starting JDownloader...")
         Popen(['jdownloader', '&'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
         sleep(20)

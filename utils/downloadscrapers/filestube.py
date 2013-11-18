@@ -3,6 +3,7 @@ import lxml.html
 
 from utils.classes.link import Link
 from interface import LinkScraperInterface
+from utils import logger
 
 
 class Filestube(LinkScraperInterface):
@@ -24,7 +25,7 @@ class Filestube(LinkScraperInterface):
         try:
             html = requests.get(url).text
         except requests.exceptions.ConnectionError:
-            print "ERROR: Couldn't connect to filestube!"
+            logger.error("ERROR: Couldn't connect to filestube!")
             return []
         doc = lxml.html.fromstring(html)
         results = doc.cssselect("div#newresult")
@@ -35,7 +36,7 @@ class Filestube(LinkScraperInterface):
                 link = self._BASE_URL + a_tag.get('href')
                 links.append(link)
             except IndexError:
-                print "there was no link on the page"
+                logger.error("there was no link on the page")
                 continue
         return links
 
@@ -45,7 +46,3 @@ class Filestube(LinkScraperInterface):
         links = doc.cssselect("pre#copy_paste_links")[0].text_content().strip("\"").strip().split()
         title = doc.cssselect("div.dotter h1")[0].text_content()[:-9]  # -9 here to remove " download"
         return Link(title=title, uris=links)
-
-if __name__ == '__main__':
-    filestube = Filestube()
-    print filestube.getlinks("how i met your mother s06e03")

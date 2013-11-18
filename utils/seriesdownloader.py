@@ -1,6 +1,7 @@
 from settings import DOWNLOADERS
-import askuser
-from importer import doimport, modulejoin
+from utils import askuser
+from utils.importer import doimport, modulejoin
+from utils import logger
 
 DOWNLOADSCRAPERS_MODULE = modulejoin("utils", "downloadscrapers")
 DOWNLOADERS_MODULE = modulejoin("utils", "downloaders")
@@ -28,20 +29,20 @@ def _download(query, start=False):
     try:
         Scrapercls = doimport(scrapermodule)
     except ImportError:
-        print "Couldn't import scraper '{}' ({})".format(scrapertype, scrapermodule)
+        logger.critical("Couldn't import scraper '{}' ({})".format(scrapertype, scrapermodule))
     scraper = Scrapercls()
     links = scraper.getlinks(query)
     downloadmodule = modulejoin(DOWNLOADERS_MODULE, downloadtype['downloader'], downloadtype['downloader'].capitalize())
     try:
         Downloader = doimport(downloadmodule)
     except ImportError:
-        print "Couldn't import downloader '{}' ({})".format(downloadtype, downloadmodule)
+        logger.critical("Couldn't import downloader '{}' ({})".format(downloadtype, downloadmodule))
 
     downloader = Downloader()
 
     link = askuser.multipleoptions("Which file should we download?", links, lambda x: x.title)
     if link is None:
-        print "No link chosen"
+        logger.info("No link chosen")
         return False
     downloader.download(link)
     # report progress

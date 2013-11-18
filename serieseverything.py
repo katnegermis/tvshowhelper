@@ -29,7 +29,6 @@ Options:
     --rename -r                     Rename file [default: 'all'].
 """
 
-from datetime import datetime
 from os import listdir
 
 from docopt import docopt
@@ -39,10 +38,11 @@ from utils.seriesnamehandler import getepisodeinfo, getshowname
 from utils.seriescache import SeriesCache
 from utils.seriesdownloader import downloadepisode
 from utils.seriesrenamer import renameepisode
-from settings import AIR_DATE_FORMAT
+from utils import logger
 
 
 def main(args):
+    logger.info("Started..")
     cache = SeriesCache()
     if args.get('<showname>', False):
         showname = getshowname(" ".join(args['<showname>']))
@@ -65,13 +65,13 @@ def main(args):
     elif args.get('--rename', False) and args.get('<filename>', False):
         rename(cache, args['<filename>'])
     else:
-        print('Unimplemented/unknown arguments! {}'.format(args))
+        logger.warn('Unimplemented/unknown arguments! {}'.format(args))
 
 
 def watchnext(showname, cache):
     episode = cache.getnextepisode(showname)
     if episode is None:
-        print "Couldn't find any new episodes!"
+        logger.warn("Couldn't find any new episodes!")
         return
     if watchepisode(episode):
         cache.markwatched(episode)
@@ -87,8 +87,8 @@ def watch(showname, cache, episodestring):
 
 def nextepisode(showname, cache):
     episode = cache.getnextepisode(showname)
-    print u"Next episode is: {} ({}): {}".format(episode.getprettyname(),
-                                                 episode.getairdatestr()).encode('utf8')
+    logger.info("Next episode is: {} ({}): {}".format(episode.getprettyname(),
+                                                      episode.getairdatestr()).encode('utf8'))
 
 
 def markwatched(showname, cache, episodestring, markprevious, watched):
