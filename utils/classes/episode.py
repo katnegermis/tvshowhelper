@@ -7,10 +7,10 @@ class Episode(object):
     def __init__(self, number, showname=None, name=None, airdate=None, seasonnumber=None, description=None, watched=False):
         self.number = self._formatnumber(number)
         self.name = name
-        self.airdate = airdate
+        self.airdate = airdate  # make sure that it's a datetime object
         self.description = description
         self.watched = watched
-        self.seasonnumber = seasonnumber
+        self.seasonnumber = self._formatnumber(seasonnumber)
         self.showname = showname
         self.aired = self.airdate < datetime.now()
 

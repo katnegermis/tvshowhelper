@@ -5,7 +5,7 @@ import os
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 
 """ Path to file that contains information about user's shows. """
-CACHE_FILE = os.path.join(ROOT_DIR, "cache.json")
+DB_FILE = os.path.join(ROOT_DIR, "database.sqlite")
 
 """ TV-series root folder. """
 SERIES_ROOT_FOLDER = "/home/katnegermis/downloads"

@@ -1,188 +1,141 @@
-import json
-import codecs
-import shutil
+import sqlite3 as sqlite
 from datetime import datetime
 
-from settings import AIR_DATE_FORMAT, CACHE_FILE
+from settings import DB_FILE
 from utils.informationscrapers import imdb
 from utils.classes.show import Show
 from utils.classes.season import Season
 from utils.classes.episode import Episode
 
 
-def log(text):
+SQL_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+
+def _getdbcon():
+    db = sqlite.connect(DB_FILE)
+    c = db.cursor()
+    showstable = """
+        CREATE TABLE IF NOT EXISTS shows (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT
+        );
+        """
+    c.execute(showstable)
+
+    episodestable = """
+        CREATE TABLE IF NOT EXISTS episodes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            show_id INTEGER,
+            number INTEGER,
+            name TEXT,
+            airdate TEXT,
+            description TEXT,
+            watched INTEGER,
+            season_number INTEGER,
+            FOREIGN KEY(show_id) REFERENCES shows(id)
+        );
+         """
+    c.execute(episodestable)
+    db.commit()
+    return db
+
+
+def getepisode(showname, seasonnum, episodenum, update=False):
+    if not showexists(showname):
+        show = imdb.getshow(showname)
+        _storeshow(show)
+    if update:
+        updateshow(showname)
+    sql = """
+        SELECT e.number, e.name, e.airdate, e.description, e.watched, e.season_number
+        FROM shows AS s, episodes AS e
+        WHERE s.name = ?
+          AND e.season_number = ?
+          AND e.number = ?;
+        """
+    db = _getdbcon()
+    c = db.cursor()
+    c.execute(sql, (showname, seasonnum, episodenum))
+    rows = c.fetchall()
+    assert len(rows) == 1, "Duplicate shows in database!"
+    db.close()
+    return _rowtoepisode(showname, rows[0])
+
+
+def getnextepisode(showname):
+    db = _getdbcon()
+    db.close()
+
+
+def markwatched(showname, episode, markprevious=False, watched=True):
+    db = _getdbcon()
+    db.close()
+
+
+def updateshow(showname):
+    db = _getdbcon()
+    imdb
+    db.close()
+
+
+def showexists(showname):
+    db = _getdbcon()
+    c = db.cursor()
+    sql = """
+        SELECT *
+        FROM shows
+        WHERE name = ?;
+        """
+    c.execute(sql, (showname,))
+    rows = c.fetchall()
+    print rows
+    res = len(rows) if rows is not None else 0
+    assert res in (0, 1), "Duplicate shows in database!"
+    return res == 1
+
+
+def _rowtoshow(row):
     pass
 
 
-class SeriesCache(object):
-    """ A dictionary of shows, with show names as keys.
-    Each show is either serialized (an instance of Show) or not (a dictionary).
-    Each show will be serialized before returned from this class.
-    """
-    _shows = None
+def _rowtoepisode(showname, row):
+    return Episode(number=row[0],
+                   name=row[1],
+                   airdate=datetime.strptime(row[2], SQL_DATE_FORMAT),
+                   description=row[3],
+                   watched=row[4],
+                   seasonnumber=row[5],
+                   showname=showname)
 
-    def getshow(self, showname, update=False):
-        """ Retrieve a show from the cache. If it does not already exist in
-        the cache, it will be retrieved from the internet. At this point in time
-        only imdb is searched.
+
+def _storeshow(show):
+    sql = """
+        INSERT INTO shows (name)
+        VALUES (?);
         """
-        # cache hit, not forced update
-        if not update and self._shows is not None and showname in self._shows:
-            if not isinstance(self._shows[showname], Show):
-                self._shows[showname] = self._dicttoshow(showname, self._shows[showname])
-            return self._shows[showname]
-        # check if we have already read something from cache
-        if self._shows is None:
-            self._shows = self._readcache()
-            # check if cache was empty
-            if self._shows is None:
-                self._shows = {}
-        # check if we should update show cache
-        if update or showname not in self._shows:
-            showtmp = imdb.getshow(showname)
-            if showname in self._shows:
-                showtmp = self._saveepisodeproperties(showname, self._shows[showname], showtmp)
-            self._shows[showname] = showtmp
-            self._savecache(self._shows)
-        # make sure that show is instance of Show
-        if not isinstance(self._shows[showname], Show):
-            self._shows[showname] = self._dicttoshow(showname, self._shows[showname])
-        return self._shows[showname]
+    db = _getdbcon()
+    c = db.cursor()
+    c.execute(sql, (show.name,))
+    db.commit()
+    db.close()
+    for season in show.seasons:
+        _storeepisodes(season.episodes)
 
-    def getseason(self, showname, seasonnum, update=False):
-        """ Retrieve a season from a show, from the cache.
+
+def _storeepisodes(episodes):
+    showname = episodes[0].showname
+    if not showexists(showname):
+        show = imdb.getshow(showname)
+        _storeshow(show)
+    sql = """
+        INSERT INTO episodes (number, name, airdate, description, watched, season_number)
+        VALUES (?, ?, ?, ?, ?, ?);
         """
-        show = self.getshow(showname, update=update)
-        # make sure that the cache is up to date
-        if not show.hasseason(seasonnum) and not update:
-            show = self.getshow(showname, update=True)
-            if not show.hasseason(seasonnum):
-                return None
-        return show.getseason(seasonnum)
-
-    def getepisode(self, showname, seasonnum, episodenum, update=False):
-        """ Retrieve an episode from a season from a show, from the cache.
-        """
-        season = self.getseason(showname, seasonnum, update=update)
-        # make sure that the cache is up to date
-        if (season is None or not season.hasepisode(episodenum)) and not update:
-            season = self.getseason(showname, seasonnum, update=True)
-            if season is None or not season.hasepisode(episodenum):
-                return None
-        return season.getepisode(episodenum)
-
-    def saveshow(self, show):
-        self._shows[show.name] = show
-        self._savecache(self._shows)
-
-    def getnextepisode(self, showname):
-        show = self.getshow(showname)
-        nextepisode = None
-        nextseason = None
-        for season in show.seasons:
-            for episode in season.episodes:
-                if episode.watched:
-                    continue
-                if nextepisode is None:
-                    nextepisode = episode
-                if nextseason is None:
-                    nextseason = season
-                if (int(season.number) < int(nextseason.number) or
-                        int(season.number) == int(nextseason.number) and
-                        int(episode.number) < int(nextepisode.number)):
-                    nextepisode = episode
-                    nextseason = season
-        return nextepisode
-
-    def markwatched(self, episode, markprevious=False, watched=True):
-        show = self.getshow(episode.showname)
-        self._markepisode(episode, markprevious, watched)
-        self.saveshow(show)
-
-    def _markepisode(self, episode, markprevious=False, watched=True):
-        show = self.getshow(episode.showname)
-        for season in show.seasons:
-            if int(season.number) > int(episode.seasonnumber):
-                continue
-            if int(season.number) < int(episode.seasonnumber) and markprevious:
-                for ep in season.episodes:
-                    ep.watched = watched
-            if int(season.number) == int(episode.seasonnumber):
-                for ep in season.episodes:
-                    if int(ep.number) < int(episode.number) and markprevious:
-                        ep.watched = watched
-                    if int(ep.number) == int(episode.number):
-                        ep.watched = watched
-
-    def _saveepisodeproperties(self, showname, oldshow, newshow):
-        if not isinstance(oldshow, Show):
-            oldshow = self._dicttoshow(showname, oldshow)
-        for oldseason in oldshow.seasons:
-            if not newshow.hasseason(oldseason.number):
-                continue
-            newseason = newshow.getseason(oldseason.number)
-            for oldepisode in oldseason.episodes:
-                if not newseason.hasepisode(oldepisode.number):
-                    continue
-                newepisode = newseason.getepisode(oldepisode.number)
-                newepisode.setproperties(**oldepisode.getproperties())
-        return newshow
-
-    def _readcache(self):
-        log("reading cache")
-        try:
-            with codecs.open(CACHE_FILE, 'r', 'utf8') as f:
-                return json.loads(f.read())
-        except (IOError, ValueError) as e:
-            log("{}.\n\"{}\".".format(e, CACHE_FILE))
-            return None
-
-    def _savecache(self, shows):
-        log("Saving cache")
-        try:
-            with codecs.open(CACHE_FILE + ".tmp", 'w+', 'utf8') as f:
-                f.write(self._serializeshows(shows))
-                f.flush()
-            shutil.move(CACHE_FILE + ".tmp", CACHE_FILE)
-        except IOError:
-            log("Couldn't write to cache \"{}\"".format(CACHE_FILE))
-
-    def _serializeshows(self, shows):
-        """ Serialize shows to json text """
-        log("Serializing data")
-        for showname in shows:
-            if isinstance(shows[showname], Show):
-                shows[showname] = self._showtodict(shows[showname])
-        return json.dumps(shows, indent=4)
-
-    def _dicttoshow(self, showname, dic):
-        show = Show(name=showname, imdburl=dic['imdburl'])
-        for seasonnum in dic['season']:
-            season = Season(number=seasonnum, name="{} - {}".format(showname, seasonnum))
-            show.addseason(season)
-            for episodenum in dic['season'][seasonnum]['episode']:
-
-                episode = Episode(number=episodenum,
-                                  name=dic['season'][seasonnum]['episode'][episodenum]['name'],
-                                  airdate=datetime.strptime(dic['season'][seasonnum]['episode'][episodenum]['airdate'], AIR_DATE_FORMAT),
-                                  description=dic['season'][seasonnum]['episode'][episodenum]['description'],
-                                  watched=dic['season'][seasonnum]['episode'][episodenum]['watched'],
-                                  seasonnumber=seasonnum,
-                                  showname=showname,)
-                season.addepisode(episode)
-        return show
-
-    def _showtodict(self, show):
-        """ Convert show to a dictionary """
-        obj = {'season': {}}
-        obj['imdburl'] = show.imdburl
-        for season in show.seasons:
-            obj['season'][season.number] = {'episode': {}}
-            for episode in season.episodes:
-                obj['season'][season.number]['episode'][episode.number] = {
-                    'name': episode.name,
-                    'watched': episode.watched,
-                    'description': episode.description,
-                    'airdate': datetime.strftime(episode.airdate, AIR_DATE_FORMAT),
-                }
-        return obj
+    episodetuples = map(lambda e: (e.number, e.name, e.airdate, e.description,
+                                   e.watched, e.seasonnumber),
+                        episodes)
+    db = _getdbcon()
+    c = db.cursor()
+    c.executemany(sql, episodetuples)
+    db.commit()
+    db.close()
