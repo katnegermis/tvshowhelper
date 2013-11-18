@@ -3,3 +3,4 @@ test/
 *.TODO
 *.pyc
 *.bak
+*.db
