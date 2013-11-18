@@ -1,7 +1,7 @@
 from os import path, mkdir
 import shutil
 
-from settings.settings import SERIES_ROOT_FOLDER, IF_NOT_SHOW_EXISTS_CREATE_FOLDER
+from settings import SERIES_ROOT_FOLDER, IF_NOT_SHOW_EXISTS_CREATE_FOLDER
 from seriesnamehandler import getepisodeinfo, getshowname
 
 

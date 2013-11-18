@@ -39,7 +39,7 @@ from utils.seriesnamehandler import getepisodeinfo, getshowname
 from utils.seriescache import SeriesCache
 from utils.seriesdownloader import downloadepisode
 from utils.seriesrenamer import renameepisode
-from settings.settings import AIR_DATE_FORMAT
+from settings import AIR_DATE_FORMAT
 
 
 def main(args):

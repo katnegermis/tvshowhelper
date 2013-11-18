@@ -1,4 +1,4 @@
-from settings.settings import DOWNLOADERS
+from settings import DOWNLOADERS
 import askuser
 from importer import doimport, modulejoin
 

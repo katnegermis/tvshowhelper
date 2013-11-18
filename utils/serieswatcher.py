@@ -1,6 +1,6 @@
 import subprocess
 
-from settings.settings import VIDEO_COMMAND
+from settings import VIDEO_COMMAND
 from seriesnamehandler import getepisodepath
 from seriesdownloader import downloadepisode
 from utils import askuser
