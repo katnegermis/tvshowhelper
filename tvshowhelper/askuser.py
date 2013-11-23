@@ -1,4 +1,4 @@
-from utils import logger
+from tvshowhelper import logger
 
 
 def yesno(question):

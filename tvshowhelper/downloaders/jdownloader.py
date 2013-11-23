@@ -5,7 +5,7 @@ import requests
 import requests.exceptions
 
 from interface import DownloaderInterface
-from utils import logger
+from tvshowhelper import logger
 
 
 class Jdownloader(DownloaderInterface):

@@ -4,10 +4,10 @@ import shutil
 from datetime import datetime
 
 from settings import AIR_DATE_FORMAT, CACHE_FILE
-from utils.informationscrapers import imdb
-from utils.classes.show import Show
-from utils.classes.season import Season
-from utils.classes.episode import Episode
+from tvshowhelper.informationscrapers import imdb
+from tvshowhelper.classes.show import Show
+from tvshowhelper.classes.season import Season
+from tvshowhelper.classes.episode import Episode
 
 
 def log(text):

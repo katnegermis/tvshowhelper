@@ -1,7 +1,7 @@
 from settings import DOWNLOADERS
-from utils import askuser
-from utils.importer import doimport, modulejoin
-from utils import logger
+from tvshowhelper import askuser
+from tvshowhelper.importer import doimport, modulejoin
+from tvshowhelper import logger
 
 DOWNLOADSCRAPERS_MODULE = modulejoin("utils", "downloadscrapers")
 DOWNLOADERS_MODULE = modulejoin("utils", "downloaders")

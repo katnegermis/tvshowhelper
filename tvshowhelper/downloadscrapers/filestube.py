@@ -1,9 +1,9 @@
 import requests
 import lxml.html
 
-from utils.classes.link import Link
+from tvshowhelper.classes.link import Link
 from interface import LinkScraperInterface
-from utils import logger
+from tvshowhelper import logger
 
 
 class Filestube(LinkScraperInterface):

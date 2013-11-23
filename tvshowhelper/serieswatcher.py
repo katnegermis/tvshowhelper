@@ -3,8 +3,8 @@ import subprocess
 from settings import VIDEO_COMMAND
 from seriesnamehandler import getepisodepath
 from seriesdownloader import downloadepisode
-from utils import askuser
-from utils import logger
+from tvshowhelper import askuser
+from tvshowhelper import logger
 
 
 def watchepisode(episode):

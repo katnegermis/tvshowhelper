@@ -2,8 +2,8 @@ from os import path, mkdir
 import shutil
 
 from settings import SERIES_ROOT_FOLDER, IF_NOT_SHOW_EXISTS_CREATE_FOLDER
-from utils.seriesnamehandler import getepisodeinfo, getshowname
-from utils import logger
+from tvshowhelper.seriesnamehandler import getepisodeinfo, getshowname
+from tvshowhelper import logger
 
 
 def renameepisode(filename, cache):

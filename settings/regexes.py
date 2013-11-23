@@ -1,4 +1,4 @@
-from utils.classes.regex import Regex
+from tvshowhelper.classes.regex import Regex
 
 SERIES_REGEXES = (
     Regex(showname="The Big Bang Theory",

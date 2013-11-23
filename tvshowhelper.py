@@ -33,13 +33,13 @@ from os import listdir
 
 from docopt import docopt
 
-from utils.serieswatcher import watchepisode
-from utils.seriesnamehandler import getepisodeinfo, getshowname
-from utils.seriescache import SeriesCache
-from utils.seriesdownloader import downloadepisode
-from utils.seriesrenamer import renameepisode
-from utils.askuser import yesno
-from utils import logger
+from tvshowhelper.serieswatcher import watchepisode
+from tvshowhelper.seriesnamehandler import getepisodeinfo, getshowname
+from tvshowhelper.seriescache import SeriesCache
+from tvshowhelper.seriesdownloader import downloadepisode
+from tvshowhelper.seriesrenamer import renameepisode
+from tvshowhelper.askuser import yesno
+from tvshowhelper import logger
 
 
 def main(args):

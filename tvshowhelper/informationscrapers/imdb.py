@@ -4,10 +4,10 @@ from datetime import datetime
 import requests
 import lxml.html
 
-from utils.informationscrapers import google
-from utils.classes.episode import Episode
-from utils.classes.season import Season
-from utils.classes.show import Show
+from tvshowhelper.informationscrapers import google
+from tvshowhelper.classes.episode import Episode
+from tvshowhelper.classes.season import Season
+from tvshowhelper.classes.show import Show
 
 
 def getshow(showname):
