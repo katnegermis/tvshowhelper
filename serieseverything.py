@@ -43,10 +43,10 @@ from utils import logger
 
 
 def main(args):
-    logger.info("Started..")
     cache = SeriesCache()
     if args.get('<showname>', False):
         showname = getshowname(" ".join(args['<showname>']))
+
     if args.get('--watch-next', False):
         watchnext(showname, cache)
     elif args.get('--watch', False):
@@ -66,7 +66,7 @@ def main(args):
     elif args.get('--rename', False) and args.get('<filename>', False):
         rename(cache, args['<filename>'])
     else:
-        logger.warn('Unimplemented/unknown arguments! {}'.format(args))
+        logger.warn('Unimplemented/unknown arguments "{}".'.format(args))
 
 
 def watchnext(showname, cache):
@@ -108,13 +108,14 @@ def download(showname, cache):
 
 
 def rename(cache, filenames):
-    if not isinstance(filenames, list) and filenames == "all":
+    if not isinstance(filenames, list) and filenames.lower() == "all":
         filenames = listdir('.')
     for filename in filenames:
         renameepisode(filename, cache=cache)
 
 
 def update(showname, cache):
+    logger.info("Updating {name}..".format(name=showname))
     cache.getshow(showname, update=True)
 
 
