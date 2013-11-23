@@ -24,7 +24,7 @@ Options:
     --mark-previous -p              Mark all previous episodes watched as well as the one specified [default: False].
     --download <episode> -d         Download episode (e.g. s01e05).
     --download-next                 Download episode (e.g. s01e05) [default: 1].
-    --update -u                     Force an update of the series
+    --update -u                     Force an update of the series cache.
     --new-episodes                  List recently aired, unwatched episodes.
     --rename -r                     Rename file [default: 'all'].
 """
@@ -33,12 +33,13 @@ from os import listdir
 
 from docopt import docopt
 
-from utils.serieswatcher import watchepisode
-from utils.seriesnamehandler import getepisodeinfo, getshowname
-from utils.seriescache import getepisode, getnextepisode, markwatched
-from utils.seriesdownloader import downloadepisode
-from utils.seriesrenamer import renameepisode
-from utils import logger
+from tvshowhelper.serieswatcher import watchepisode
+from tvshowhelper.seriesnamehandler import getepisodeinfo, getshowname
+from tvshowhelper.seriescache import SeriesCache
+from tvshowhelper.seriesdownloader import downloadepisode
+from tvshowhelper.seriesrenamer import renameepisode
+from tvshowhelper.askuser import yesno
+from tvshowhelper import logger
 
 
 def main(args):
@@ -64,13 +65,16 @@ def main(args):
     elif args.get('--rename', False) and args.get('<filename>', False):
         rename(args['<filename>'])
     else:
-        logger.warn('Unimplemented/unknown arguments! {}'.format(args))
+        print('Unimplemented/unknown arguments "{}".'.format(args))
 
 
 def watchnext(showname):
     episode = getnextepisode(showname)
     if episode is None:
-        logger.warn("Couldn't find any new episodes!")
+        print("Couldn't find any new episodes!")
+        if yesno("Would you like to update the cache?"):
+            update(showname, cache)
+            watchnext(showname, cache)  # this could be an endless loop.
         return
     if watchepisode(episode):
         markwatched(episode)

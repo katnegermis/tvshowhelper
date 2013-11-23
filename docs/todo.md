@@ -16,6 +16,7 @@ General
 - Use a virtualenv (at least for py3)
 - Use SQLite instead of JSON-file
 
+- Use None as airdate if none was found.
 
 SQLite
 --------
