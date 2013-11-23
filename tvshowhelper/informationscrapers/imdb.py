@@ -5,12 +5,15 @@ import requests
 import lxml.html
 
 from tvshowhelper.informationscrapers import google
+from tvshowhelper.informationscrapers import random_useragent
 from tvshowhelper.classes.episode import Episode
 from tvshowhelper.classes.season import Season
 from tvshowhelper.classes.show import Show
 
 
 def getshow(showname):
+    if not isinstance(showname, str):
+        raise TypeError("showname must be a string")
     imdburl = _getimdburl(showname)
     show = Show(name=showname, imdburl=imdburl)
     for season in getseasons(showname, imdburl=imdburl):
@@ -25,6 +28,8 @@ def getnumseasons(showname, imdburl=None):
 
 
 def getseasons(showname, imdburl=None):
+    if not isinstance(showname, str):
+        raise TypeError("showname must be a string")
     episodesurl = _getimdbepisodesurl(showname, imdburl)
     html = _gethtml(episodesurl)
     doc = lxml.html.fromstring(html)
@@ -39,6 +44,10 @@ def getnumepisodes(showname, season, imdburl=None):
 
 
 def getepisodes(showname, season, imdburl=None):
+    if not isinstance(showname, str):
+        raise TypeError("showname must be a string")
+    if imdburl is None:
+        imdburl = _getimdburl(showname)
     seasonurl = _getimdbseasonurl(showname, season, imdburl)
     html = _gethtml(seasonurl)
     doc = lxml.html.fromstring(html)
@@ -62,13 +71,13 @@ def getepisodes(showname, season, imdburl=None):
 
 
 def _getimdburl(showname):
-    return google.getimdblink("site:www.imdb.com {}".format(showname))
+    results = google.query("site:www.imdb.com {}".format(showname))
+    return results[0]['link']
 
 
 def _getimdbepisodesurl(showname, imdburl=None):
     if imdburl is None:
         imdburl = _getimdburl(showname)
-        print imdburl
     if not imdburl is None and not imdburl.endswith("/"):
         imdburl += "/"
     return "{}episodes".format(imdburl)
@@ -89,7 +98,7 @@ def _getimdbid(imdburl):
 def _gethtml(url):
     html = None
     try:
-        html = requests.get(url).text
+        html = requests.get(url, headers={'User-Agent': random_useragent()}).text
     except requests.exceptions.ConnectionError:
         raise Exception("Couldn't connect to {}".format(url))
     return html
