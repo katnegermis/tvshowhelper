@@ -9,7 +9,7 @@ class Season(object):
         return unicode(self.getprettyname())
 
     def __repr__(self):
-        return self.getprettyname().encode('utf8')
+        return self.getprettyname()
 
     def getprettyname(self):
         name = self.name
