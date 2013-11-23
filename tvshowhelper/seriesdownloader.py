@@ -3,8 +3,8 @@ from tvshowhelper import askuser
 from tvshowhelper.importer import doimport, modulejoin
 from tvshowhelper import logger
 
-DOWNLOADSCRAPERS_MODULE = modulejoin("utils", "downloadscrapers")
-DOWNLOADERS_MODULE = modulejoin("utils", "downloaders")
+DOWNLOADSCRAPERS_MODULE = modulejoin("tvshowhelper", "downloadscrapers")
+DOWNLOADERS_MODULE = modulejoin("tvshowhelper", "downloaders")
 
 
 def downloadepisode(episode, start=True):
@@ -29,7 +29,8 @@ def _download(query, start=False):
     try:
         Scrapercls = doimport(scrapermodule)
     except ImportError:
-        print("Couldn't import scraper '{}' ({})".format(scrapertype, scrapermodule))
+        print("Couldn't import scraper '{}' ({})".format(scrapermodule, scrapermodule))
+        return
     scraper = Scrapercls()
     links = scraper.getlinks(query)
     downloadmodule = modulejoin(DOWNLOADERS_MODULE, downloadtype['downloader'], downloadtype['downloader'].capitalize())
