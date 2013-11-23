@@ -13,14 +13,14 @@ def watchepisode(episode):
     """
     assert(episode is not None)
     if not episode.aired:
-        logger.info("{} hasn't aired yet! It will air {}.".format(episode.getprettyname(), episode.getairdatestr()))
+        print("{} hasn't aired yet! It will air {}.".format(episode.getprettyname(), episode.getairdatestr()))
         return False
     episodepath = getepisodepath(episode.showname, episode)
     if episodepath is None:
         _doesntexist_shoulddownload(episode)
         return False  # do something here, based on response from doesntexist_shoulddownload
 
-    logger.info("Now watching {} ({})".format(episode.getprettyname(), episodepath))
+    print("Now watching {} ({})".format(episode.getprettyname(), episodepath))
     subprocess.call([VIDEO_COMMAND, episodepath], stdin=subprocess.PIPE,
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     # After episode has been watched, tell user of airdate/episode name of next episode

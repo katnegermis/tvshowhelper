@@ -21,12 +21,12 @@ class Jdownloader(DownloaderInterface):
         try:
             requests.get(url)
         except requests.exceptions.ConnectionError:
-            logger.warning("JDownloader doesn't seem to be running. Please open it and try again!")
+            print("JDownloader doesn't seem to be running. Please open it and try again!")
 
     def _running(self):
         return True
 
     def _start(self):
-        logger.info("Starting JDownloader...")
+        print("Starting JDownloader...")
         Popen(['jdownloader', '&'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
         sleep(20)

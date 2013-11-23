@@ -44,8 +44,10 @@ from utils import logger
 
 def main(args):
     cache = SeriesCache()
+    logger.debug("Arguments; {args}".format(args=args))
     if args.get('<showname>', False):
         showname = getshowname(" ".join(args['<showname>']))
+        logger.info("Showname: '{name}'".format(name=showname))
 
     if args.get('--watch-next', False):
         watchnext(showname, cache)
@@ -66,13 +68,14 @@ def main(args):
     elif args.get('--rename', False) and args.get('<filename>', False):
         rename(cache, args['<filename>'])
     else:
-        logger.warn('Unimplemented/unknown arguments "{}".'.format(args))
+        print('Unimplemented/unknown arguments "{}".'.format(args))
 
 
 def watchnext(showname, cache):
+    logger.info("watchnext")
     episode = cache.getnextepisode(showname)
     if episode is None:
-        logger.warn("Couldn't find any new episodes!")
+        print("Couldn't find any new episodes!")
         if yesno("Would you like to update the cache?"):
             update(showname, cache)
             watchnext(showname, cache)  # this could be an endless loop.
@@ -82,6 +85,7 @@ def watchnext(showname, cache):
 
 
 def watch(showname, cache, episodestring):
+    logger.info("watch({name}, {epstring})".format(name=showname, epstring=episodestring))
     seasonnum, episodenum = getepisodeinfo(episodestring)
     assert(seasonnum is not None and episodenum is not None)
     episode = cache.getepisode(showname, seasonnum, episodenum)
@@ -90,24 +94,28 @@ def watch(showname, cache, episodestring):
 
 
 def nextepisode(showname, cache):
+    logger.info("nextepisode")
     episode = cache.getnextepisode(showname)
-    logger.info("Next episode is: {} ({}): {}".format(episode.getprettyname(),
-                                                      episode.getairdatestr()).encode('utf8'))
+    print("Next episode is: {} ({}): {}".format(episode.getprettyname(),
+                                                episode.getairdatestr()).encode('utf8'))
 
 
 def markwatched(showname, cache, episodestring, markprevious, watched):
+    logger.info("markwatched")
     seasonnum, episodenum = getepisodeinfo(episodestring)
     episode = cache.getepisode(showname, seasonnum, episodenum)
     cache.markwatched(episode, markprevious=markprevious, watched=watched)
 
 
 def download(showname, cache):
+    logger.info("download")
     seasonnum, episodenum = getepisodeinfo(args['--download'])
     episode = cache.getepisode(showname, seasonnum, episodenum)
     downloadepisode(episode)
 
 
 def rename(cache, filenames):
+    logger.info("rename")
     if not isinstance(filenames, list) and filenames.lower() == "all":
         filenames = listdir('.')
     for filename in filenames:
@@ -115,7 +123,8 @@ def rename(cache, filenames):
 
 
 def update(showname, cache):
-    logger.info("Updating {name}..".format(name=showname))
+    logger.info("update")
+    print("Updating {name}..".format(name=showname))
     cache.getshow(showname, update=True)
 
 

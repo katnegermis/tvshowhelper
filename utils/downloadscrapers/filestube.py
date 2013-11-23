@@ -25,7 +25,7 @@ class Filestube(LinkScraperInterface):
         try:
             html = requests.get(url).text
         except requests.exceptions.ConnectionError:
-            logger.error("ERROR: Couldn't connect to filestube!")
+            print("ERROR: Couldn't connect to filestube!")
             return []
         doc = lxml.html.fromstring(html)
         results = doc.cssselect("div#newresult")
@@ -36,7 +36,7 @@ class Filestube(LinkScraperInterface):
                 link = self._BASE_URL + a_tag.get('href')
                 links.append(link)
             except IndexError:
-                logger.error("there was no link on the page")
+                print("there was no link on the page")
                 continue
         return links
 
