@@ -7,9 +7,7 @@ def yesno(question):
     logger.info("n: No")
     logger.info("y: Yes")
     res = raw_input()
-    if not res.lower().startswith("y"):
-        return False
-    return True
+    return res.lower().startswith("y")
 
 
 def multipleoptions(question, options, unwrapfunction=None, noneoption=True):

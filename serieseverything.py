@@ -38,6 +38,7 @@ from utils.seriesnamehandler import getepisodeinfo, getshowname
 from utils.seriescache import SeriesCache
 from utils.seriesdownloader import downloadepisode
 from utils.seriesrenamer import renameepisode
+from utils.askuser import yesno
 from utils import logger
 
 
@@ -72,6 +73,9 @@ def watchnext(showname, cache):
     episode = cache.getnextepisode(showname)
     if episode is None:
         logger.warn("Couldn't find any new episodes!")
+        if yesno("Would you like to update the cache?"):
+            update(showname, cache)
+            watchnext(showname, cache)  # this could be an endless loop.
         return
     if watchepisode(episode):
         cache.markwatched(episode)
