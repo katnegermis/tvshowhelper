@@ -24,9 +24,16 @@ class Jdownloader(DownloaderInterface):
             print("JDownloader doesn't seem to be running. Please open it and try again!")
 
     def _running(self):
-        return True
+        p = Popen(["ps", "-A"], stdout=PIPE)
+        out, err = p.communicate()
+        for line in out.splitlines():
+            if 'jdownloader' in line:
+                return True
+        return False
 
     def _start(self):
         print("Starting JDownloader...")
-        Popen(['jdownloader', '&'], stdout=PIPE, stderr=PIPE, stdin=PIPE)
+        Popen(['jdownloader'], stderr=PIPE)
+        while not self._running():
+            sleep(2)
         sleep(20)
