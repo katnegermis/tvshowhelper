@@ -44,7 +44,7 @@ from tvshowhelper import logger
 
 def main(args):
     cache = SeriesCache()
-    logger.debug("Arguments; {args}".format(args=args))
+    logger.debug("Arguments: {args}".format(args=args))
     if args.get('<showname>', False):
         showname = getshowname(" ".join(args['<showname>']))
         logger.info("Showname: '{name}'".format(name=showname))
