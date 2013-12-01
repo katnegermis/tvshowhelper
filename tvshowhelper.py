@@ -96,8 +96,11 @@ def watch(showname, cache, episodestring):
 def nextepisode(showname, cache):
     logger.info("nextepisode")
     episode = cache.getnextepisode(showname)
-    print("Next episode is: {} ({}): {}".format(episode.getprettyname(),
-                                                episode.getairdatestr()).encode('utf8'))
+    if episode is None:
+        print "No episode found!"
+        return
+    print("Next episode is: {episode}: {date}".format(episode=episode.getprettyname(),
+                                                      date=episode.getairdatestr()).encode('utf8'))
 
 
 def markwatched(showname, cache, episodestring, markprevious, watched):
