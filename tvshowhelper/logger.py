@@ -1,7 +1,7 @@
 import logging
 
 logger = logging.getLogger('series_everything')
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

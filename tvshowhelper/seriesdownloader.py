@@ -33,6 +33,9 @@ def _download(query, start=False):
         return
     scraper = Scrapercls()
     links = scraper.getlinks(query)
+    if not links:
+        print("Couldn't find any links.")
+        return
     downloadmodule = modulejoin(DOWNLOADERS_MODULE, downloadtype['downloader'], downloadtype['downloader'].capitalize())
     try:
         Downloader = doimport(downloadmodule)
