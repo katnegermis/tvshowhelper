@@ -33,7 +33,11 @@ class Jdownloader(DownloaderInterface):
 
     def _start(self):
         print("Starting JDownloader...")
-        Popen(['jdownloader'], stderr=PIPE)
+        try:
+            Popen(['jdownloader'], stderr=PIPE)
+        except Exception, e:
+            print "Error while starting JDownloader: {err}".format(err=e)
+            return
         while not self._running():
             sleep(2)
         sleep(20)
