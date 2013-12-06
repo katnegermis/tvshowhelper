@@ -1,7 +1,7 @@
 import os
 
 from settings import (SEASON_EPISODE_REGEX, SEASON_EPISODE_REGEX_EXTRAS, SERIES_ROOT_FOLDER,
-                               SERIES_DOWNLOAD_FOLDER, SEARCH_DOWNLOAD_FOLDER)
+                      SERIES_DOWNLOAD_FOLDER, SEARCH_DOWNLOAD_FOLDER, MEDIA_EXTENSIONS)
 from settings.regexes import SERIES_REGEXES
 import askuser
 
@@ -52,13 +52,15 @@ def getepisodepath(showname, episode):
     for searchdir in searchdirs:
         if not os.path.exists(searchdir):
             continue
-        for filename in os.listdir(searchdir):  # perhaps do listdir with specific file-extensions only?
-            if showname != getshowname(filename):
+        for filename in os.listdir(searchdir):
+            __, ext = os.path.splitext(filename)
+            # Make sure that file has a media-extension, and is from the given show.
+            if ext[1:] not in MEDIA_EXTENSIONS or showname != getshowname(filename):
                 continue
             seasonnumtmp, episodenumtmp = getepisodeinfo(filename)
             if seasonnumtmp is None or episodenumtmp is None:
                 continue
-            if (episode.seasonnumber == seasonnumtmp and episode.number == episodenumtmp):
+            if episode == (seasonnumtmp, episodenumtmp):
                 return os.path.join(searchdir, filename)
     return None
 
