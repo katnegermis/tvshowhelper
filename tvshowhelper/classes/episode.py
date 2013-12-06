@@ -20,6 +20,12 @@ class Episode(object):
     def __repr__(self):
         return self.name
 
+    def __eq__(self, obj):
+        if isinstance(obj, tuple) and len(obj) == 2:
+            season, episode = obj
+            return self.seasonnumber == season and self.number == episode
+        return False
+
     def getprettyname(self):
         name = ""
         if self.name is not None:
