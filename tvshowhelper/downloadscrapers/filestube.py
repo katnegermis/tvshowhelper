@@ -14,7 +14,7 @@ class Filestube(LinkScraperInterface):
     _LIST_URL = (_BASE_URL + "query.html?q={query}&select=All&hosting=24,81&"
                  "page={{pageid}}&sizefrom={sizefrom}&sizeto={sizeto}")
     _LINKS_PER_PAGE = 10
-    _NUM_PAGES_SCRAPED = 10
+    _NUM_PAGES_SCRAPED = 2
 
     def getlinks(self, query, numlinks=5, size=(100, 1500)):
         start = datetime.now()
@@ -25,8 +25,7 @@ class Filestube(LinkScraperInterface):
         res = []
         for link in links:
             res += link
-        links = res
-        links = filter(lambda x: x is not None, links)
+        links = filter(lambda x: x is not None, res)
         stop = datetime.now()
         logger.debug("getlinks took: {time}".format(time=stop - start))
         return links[:numlinks]
@@ -76,7 +75,6 @@ class Filestube(LinkScraperInterface):
         return Link(title=title, uris=uris)
 
     def _validate(self, link):
-        logger.debug("_validate")
         response = self._getresponse(link)
         if not response:
             return None
