@@ -2,17 +2,17 @@
 """Series everything
 
 Usage:
-    serieseverything.py <showname>... --watch-next
-    serieseverything.py <showname>... --update
-    serieseverything.py <showname>... --watch <episode>
-    serieseverything.py <showname>... --next-episode
-    serieseverything.py <showname>... --list
-    serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]
-    serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]
-    serieseverything.py <showname>... --download <episode>
-    serieseverything.py <showname>... --download-next <number>
-    serieseverything.py <filename>... --rename
-    serieseverything.py --new-episodes
+    serieseverything.py <showname>... --watch-next  [-v]
+    serieseverything.py <showname>... --update  [-v]
+    serieseverything.py <showname>... --watch <episode>  [-v]
+    serieseverything.py <showname>... --next-episode  [-v]
+    serieseverything.py <showname>... --list  [-v]
+    serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]  [-v]
+    serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]  [-v]
+    serieseverything.py <showname>... --download <episode>  [-v]
+    serieseverything.py <showname>... --download-next <number>  [-v]
+    serieseverything.py <filename>... --rename  [-v]
+    serieseverything.py --new-episodes  [-v]
 
 Options:
     --help -h                       Show this screen.
@@ -27,6 +27,7 @@ Options:
     --update -u                     Force an update of the series cache.
     --new-episodes                  List recently aired, unwatched episodes.
     --rename -r                     Rename file [default: 'all'].
+    --verbose -v                    Verbose logging
 """
 
 from os import listdir
@@ -39,12 +40,14 @@ from tvshowhelper.seriescache import SeriesCache
 from tvshowhelper.seriesdownloader import downloadepisode
 from tvshowhelper.seriesrenamer import renameepisode
 from tvshowhelper.askuser import yesno
-from tvshowhelper import logger
+from tvshowhelper.logger import logger, setlevel as setlogginglevel
 
 
 def main(args):
     try:
         cache = SeriesCache()
+        if args.get('--verbose', False):
+            setlogginglevel('debug')
         logger.debug("Arguments: {args}".format(args=args))
         if args.get('<showname>', False):
             showname = getshowname(" ".join(args['<showname>']))
