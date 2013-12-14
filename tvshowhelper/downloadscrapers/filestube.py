@@ -14,7 +14,7 @@ class Filestube(LinkScraperInterface):
     _LIST_URL = (_BASE_URL + "query.html?q={query}&select=All&hosting=24,81&"
                  "page={{pageid}}&sizefrom={sizefrom}&sizeto={sizeto}")
     _LINKS_PER_PAGE = 10
-    _NUM_PAGES_SCRAPED = 2
+    _NUM_PAGES_SCRAPED = 3
 
     def getlinks(self, query, numlinks=5, size=(100, 1500)):
         start = datetime.now()
@@ -67,11 +67,15 @@ class Filestube(LinkScraperInterface):
         logger.debug("Getting filehost links")
         doc = lxml.html.fromstring(html)
         links = doc.cssselect("pre#copy_paste_links")[0].text_content().strip("\"").strip().split()
-        title = doc.cssselect("div.dotter h1")[0].text_content()[:-9]  # -9 here to remove " download"
-        # logger.debug("Links: {links}".format(links=links))
+        try:
+            title = doc.cssselect("div.dotter h1")[0].text_content()
+        except IndexError:
+            logger.debug("div.dotter.h1 doesn't exist. Skipping..")
+            return None
         uris = parallel_map(self._validate, links)
         if None in uris:
             return None
+        title = title[:-9]  # remove " download" from end of title
         return Link(title=title, uris=uris)
 
     def _validate(self, link):
