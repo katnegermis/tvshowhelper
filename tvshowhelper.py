@@ -69,8 +69,8 @@ def main(args):
             download(showname, cache)
         elif args.get('--update', False):
             update(showname, cache)
-        elif args.get('--rename', False) and args.get('<filename>', False):
-            rename(cache, args['<filename>'])
+        elif args.get('--rename', False):
+            rename(cache, args.get('<filename>', 'all'))
         else:
             print('Unimplemented/unknown arguments "{}".'.format(args))
 
