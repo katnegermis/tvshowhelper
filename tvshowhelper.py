@@ -70,7 +70,7 @@ def main(args):
         elif args.get('--update', False):
             update(showname, cache)
         elif args.get('--rename', False):
-            rename(cache, args.get('<filename>', 'all'))
+            rename(cache, args.get('<filename>', []))
         else:
             print('Unimplemented/unknown arguments "{}".'.format(args))
 
@@ -131,7 +131,8 @@ def download(showname, cache):
 
 def rename(cache, filenames):
     logger.info("rename")
-    if not isinstance(filenames, list) and filenames.lower() == "all":
+    # user didn't give an argument. he wants to run it on all files in folder.
+    if filenames == []:
         filenames = listdir('.')
     for filename in filenames:
         renameepisode(filename, cache=cache)
