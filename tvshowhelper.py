@@ -11,7 +11,7 @@ Usage:
     serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]  [-v]
     serieseverything.py <showname>... --download <episode>  [-v]
     serieseverything.py <showname>... --download-next <number>  [-v]
-    serieseverything.py <filename>... --rename  [-v]
+    serieseverything.py [<filename>...] --rename  [-v]
     serieseverything.py --new-episodes  [-v]
 
 Options:
