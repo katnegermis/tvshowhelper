@@ -7,6 +7,9 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 """ Path to file that contains information about user's shows. """
 DB_FILE = os.path.join(ROOT_DIR, "database.db")
 
+""" Extensions used to identify a valid media file """
+MEDIA_EXTENSIONS = ("mp4", "mkv", "avi")
+
 """ TV-series root folder. """
 SERIES_ROOT_FOLDER = "/home/katnegermis/downloads"
 

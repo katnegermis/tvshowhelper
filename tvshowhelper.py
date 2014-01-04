@@ -2,17 +2,17 @@
 """Series everything
 
 Usage:
-    serieseverything.py <showname>... --watch-next
-    serieseverything.py <showname>... --update
-    serieseverything.py <showname>... --watch <episode>
-    serieseverything.py <showname>... --next-episode
-    serieseverything.py <showname>... --list
-    serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]
-    serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]
-    serieseverything.py <showname>... --download <episode>
-    serieseverything.py <showname>... --download-next <number>
-    serieseverything.py <filename>... --rename
-    serieseverything.py --new-episodes
+    serieseverything.py <showname>... --watch-next  [-v]
+    serieseverything.py <showname>... --update  [-v]
+    serieseverything.py <showname>... --watch <episode>  [-v]
+    serieseverything.py <showname>... --next-episode  [-v]
+    serieseverything.py <showname>... --list  [-v]
+    serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]  [-v]
+    serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]  [-v]
+    serieseverything.py <showname>... --download <episode>  [-v]
+    serieseverything.py <showname>... --download-next <number>  [-v]
+    serieseverything.py [<filename>...] --rename  [-v]
+    serieseverything.py --new-episodes  [-v]
 
 Options:
     --help -h                       Show this screen.
@@ -27,6 +27,7 @@ Options:
     --update -u                     Force an update of the series cache.
     --new-episodes                  List recently aired, unwatched episodes.
     --rename -r                     Rename file [default: 'all'].
+    --verbose -v                    Verbose logging
 """
 
 from os import listdir
@@ -39,13 +40,18 @@ from tvshowhelper.seriescache import SeriesCache
 from tvshowhelper.seriesdownloader import downloadepisode
 from tvshowhelper.seriesrenamer import renameepisode
 from tvshowhelper.askuser import yesno
-from tvshowhelper import logger
+from tvshowhelper.logger import logger, setlevel as setlogginglevel
 
 
 def main(args):
-    logger.info("Started..")
+    cache = SeriesCache()
+    if args.get('--verbose', False):
+        setlogginglevel('debug')
+    logger.debug("Arguments: {args}".format(args=args))
     if args.get('<showname>', False):
         showname = getshowname(" ".join(args['<showname>']))
+        logger.info("Showname: '{name}'".format(name=showname))
+
     if args.get('--watch-next', False):
         watchnext(showname)
     elif args.get('--watch', False):
@@ -60,10 +66,10 @@ def main(args):
                     markprevious=args.get('--mark-previous', False))
     elif args.get('--download', False):
         download(showname)
-    # elif args.get('--update', False):
-    #     update(showname)
+    elif args.get('--update', False):
+        update(showname)
     elif args.get('--rename', False) and args.get('<filename>', False):
-        rename(args['<filename>'])
+        rename(cache, args['<filename>'])
     else:
         print('Unimplemented/unknown arguments "{}".'.format(args))
 
@@ -89,34 +95,48 @@ def watch(showname, episodestring):
 
 
 def nextepisode(showname):
-    episode = getnextepisode(showname)
-    logger.info("Next episode is: {} ({}): {}".format(episode.getprettyname(),
-                                                      episode.getairdatestr()).encode('utf8'))
+    logger.info("nextepisode")
+    episode = cache.getnextepisode(showname)
+    if episode is None:
+        print "No episode found!"
+        return
+    print("Next episode is: {episode}: {date}".format(episode=episode.getprettyname(),
+                                                      date=episode.getairdatestr()).encode('utf8'))
 
 
-def _markwatched(showname, episodestring, markprevious, watched):
+def markwatched(showname, cache, episodestring, markprevious, watched):
+    logger.info("markwatched")
     seasonnum, episodenum = getepisodeinfo(episodestring)
-    episode = getepisode(showname, seasonnum, episodenum)
-    markwatched(episode, markprevious=markprevious, watched=watched)
+    episode = cache.getepisode(showname, seasonnum, episodenum)
+    cache.markwatched(episode, markprevious=markprevious, watched=watched)
 
 
 def download(showname):
+    logger.info("download")
     seasonnum, episodenum = getepisodeinfo(args['--download'])
     episode = getepisode(showname, seasonnum, episodenum)
     downloadepisode(episode)
 
 
 def rename(cache, filenames):
-    if not isinstance(filenames, list) and filenames == "all":
+    logger.info("rename")
+    # user didn't give an argument. he wants to run it on all files in folder.
+    if filenames == []:
         filenames = listdir('.')
     for filename in filenames:
-        renameepisode(filename=cache)
+        renameepisode(filename)
 
 
-# def update(showname):
-#     getshow(showname, update=True)
+def update(showname):
+    logger.info("update")
+    print("Updating {name}..".format(name=showname))
+    getshow(showname, update=True)
 
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='Series everything v 0.1')
-    main(args)
+	try:
+	    main(args)
+	except (KeyboardInterrupt, SystemExit):
+        print("\nProgram stopped...")
+        return
