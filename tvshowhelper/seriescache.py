@@ -8,7 +8,7 @@ from tvshowhelper.classes.season import Season
 from tvshowhelper.classes.episode import Episode
 
 
-SQL_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+SQL_DATE_FORMAT = "%Y-%m-%d"
 
 
 def _getdbcon():
@@ -57,7 +57,10 @@ def getepisode(showname, seasonnum, episodenum, update=False):
     c = db.cursor()
     c.execute(sql, (showname, seasonnum, episodenum))
     rows = c.fetchall()
-    assert len(rows) == 1, "Duplicate shows in database!"
+    if rows == []:
+        # Episode not found.
+        return None
+    assert len(rows) == 1, "Duplicate episode in database"
     db.close()
     return _rowtoepisode(showname, rows[0])
 
@@ -74,7 +77,7 @@ def markwatched(showname, episode, markprevious=False, watched=True):
 
 def updateshow(showname):
     db = _getdbcon()
-    imdb
+    # imdb
     db.close()
 
 
@@ -88,8 +91,7 @@ def showexists(showname):
         """
     c.execute(sql, (showname,))
     rows = c.fetchall()
-    print rows
-    res = len(rows) if rows is not None else 0
+    res = len(rows) if rows != [] else 0
     assert res in (0, 1), "Duplicate shows in database!"
     return res == 1
 
@@ -101,7 +103,7 @@ def _rowtoshow(row):
 def _rowtoepisode(showname, row):
     return Episode(number=row[0],
                    name=row[1],
-                   airdate=datetime.strptime(row[2], SQL_DATE_FORMAT),
+                   airdate=datetime.strptime(row[2], SQL_DATE_FORMAT).date(),
                    description=row[3],
                    watched=row[4],
                    seasonnumber=row[5],

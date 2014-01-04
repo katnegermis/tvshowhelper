@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from settings import AIR_DATE_FORMAT
 
 
@@ -12,7 +12,7 @@ class Episode(object):
         self.watched = watched
         self.seasonnumber = self._formatnumber(seasonnumber)
         self.showname = showname
-        self.aired = self.airdate < datetime.now()
+        self.aired = self.airdate < date.today()
 
     def __unicode__(self):
         return unicode(self.name)
@@ -33,10 +33,12 @@ class Episode(object):
         return u"{} S{}E{}{}".format(self.showname, self.seasonnumber, self.number, name)
 
     def getairdatestr(self):
-        return datetime.strftime(self.airdate, AIR_DATE_FORMAT)
+        return date.strftime(self.airdate, AIR_DATE_FORMAT)
 
-    def _formatnumber(self, number):
-        return str(number).zfill(2)
+    def _formatnumber(self, number, pretty=False):
+        if pretty:
+            return str(number).zfill(2)
+        return int(number)
 
     def setproperties(self, **kwargs):
         self.watched = kwargs.get('watched', False)
