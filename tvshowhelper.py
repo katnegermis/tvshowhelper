@@ -44,39 +44,34 @@ from tvshowhelper.logger import logger, setlevel as setlogginglevel
 
 
 def main(args):
-    try:
-        cache = SeriesCache()
-        if args.get('--verbose', False):
-            setlogginglevel('debug')
-        logger.debug("Arguments: {args}".format(args=args))
-        if args.get('<showname>', False):
-            showname = getshowname(" ".join(args['<showname>']))
-            logger.info("Showname: '{name}'".format(name=showname))
+    cache = SeriesCache()
+    if args.get('--verbose', False):
+        setlogginglevel('debug')
+    logger.debug("Arguments: {args}".format(args=args))
+    if args.get('<showname>', False):
+        showname = getshowname(" ".join(args['<showname>']))
+        logger.info("Showname: '{name}'".format(name=showname))
 
-        if args.get('--watch-next', False):
-            watchnext(showname, cache)
-        elif args.get('--watch', False):
-            watch(showname, cache, args['--watch'])
-        elif args.get('--next-episode', False):
-            nextepisode(showname, cache)
-        elif args.get('--mark-watched', False):
-            markwatched(showname, cache, args['--mark-watched'], watched=True,
-                        markprevious=args.get('--mark-previous', False))
-        elif args.get('--mark-unwatched', False):
-            markwatched(showname, cache, args['--mark-unwatched'], watched=False,
-                        markprevious=args.get('--mark-previous', False))
-        elif args.get('--download', False):
-            download(showname, cache)
-        elif args.get('--update', False):
-            update(showname, cache)
-        elif args.get('--rename', False):
-            rename(cache, args.get('<filename>', []))
-        else:
-            print('Unimplemented/unknown arguments "{}".'.format(args))
-
-    except (KeyboardInterrupt, SystemExit):
-        print("\nProgram stopped...")
-        return
+    if args.get('--watch-next', False):
+        watchnext(showname, cache)
+    elif args.get('--watch', False):
+        watch(showname, cache, args['--watch'])
+    elif args.get('--next-episode', False):
+        nextepisode(showname, cache)
+    elif args.get('--mark-watched', False):
+        markwatched(showname, cache, args['--mark-watched'], watched=True,
+                    markprevious=args.get('--mark-previous', False))
+    elif args.get('--mark-unwatched', False):
+        markwatched(showname, cache, args['--mark-unwatched'], watched=False,
+                    markprevious=args.get('--mark-previous', False))
+    elif args.get('--download', False):
+        download(showname, cache)
+    elif args.get('--update', False):
+        update(showname, cache)
+    elif args.get('--rename', False):
+        rename(cache, args.get('<filename>', []))
+    else:
+        print('Unimplemented/unknown arguments "{}".'.format(args))
 
 
 def watchnext(showname, cache):
@@ -146,4 +141,7 @@ def update(showname, cache):
 
 if __name__ == '__main__':
     args = docopt(__doc__, version='Series everything v 0.1')
-    main(args)
+    try:
+        main(args)
+    except (KeyboardInterrupt, SystemExit):
+        print("\nProgram stopped...")
