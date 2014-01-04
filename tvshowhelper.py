@@ -1,18 +1,18 @@
 #!/usr/bin/python
-"""Series everything
+"""TV Show Helper
 
 Usage:
-    serieseverything.py <showname>... --watch-next  [-v]
-    serieseverything.py <showname>... --update  [-v]
-    serieseverything.py <showname>... --watch <episode>  [-v]
-    serieseverything.py <showname>... --next-episode  [-v]
-    serieseverything.py <showname>... --list  [-v]
-    serieseverything.py <showname>... --mark-watched <episode> [--mark-previous]  [-v]
-    serieseverything.py <showname>... --mark-unwatched <episode> [--mark-previous]  [-v]
-    serieseverything.py <showname>... --download <episode>  [-v]
-    serieseverything.py <showname>... --download-next <number>  [-v]
-    serieseverything.py [<filename>...] --rename  [-v]
-    serieseverything.py --new-episodes  [-v]
+    tvshowhelper.py <showname>... --watch-next  [-v]
+    tvshowhelper.py <showname>... --update  [-v]
+    tvshowhelper.py <showname>... --watch <episode>  [-v]
+    tvshowhelper.py <showname>... --next-episode  [-v]
+    tvshowhelper.py <showname>... --list  [-v]
+    tvshowhelper.py <showname>... --mark-watched <episode> [--mark-previous]  [-v]
+    tvshowhelper.py <showname>... --mark-unwatched <episode> [--mark-previous]  [-v]
+    tvshowhelper.py <showname>... --download <episode>  [-v]
+    tvshowhelper.py <showname>... --download-next <number>  [-v]
+    tvshowhelper.py [<filename>...] --rename  [-v]
+    tvshowhelper.py --new-episodes  [-v]
 
 Options:
     --help -h                       Show this screen.
@@ -40,6 +40,7 @@ from tvshowhelper.seriesdownloader import downloadepisode
 from tvshowhelper.seriesrenamer import renameepisode
 from tvshowhelper.askuser import yesno
 from tvshowhelper.logger import logger, setlevel as setlogginglevel
+from tvshowhelper.seriescache import getepisode
 
 
 def main(args):
