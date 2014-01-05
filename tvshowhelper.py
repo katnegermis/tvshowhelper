@@ -40,7 +40,7 @@ from tvshowhelper.seriesdownloader import downloadepisode
 from tvshowhelper.seriesrenamer import renameepisode
 from tvshowhelper.askuser import yesno
 from tvshowhelper.logger import logger, setlevel as setlogginglevel
-from tvshowhelper.seriescache import getepisode
+from tvshowhelper.seriescache import getepisode, getnextepisode, markwatched
 
 
 def main(args):
@@ -52,40 +52,40 @@ def main(args):
         logger.info("Showname: '{name}'".format(name=showname))
 
     if args.get('--watch-next', False):
-        watchnext(showname)
+        _watchnext(showname)
     elif args.get('--watch', False):
-        watch(showname, args['--watch'])
+        _watch(showname, args['--watch'])
     elif args.get('--next-episode', False):
-        nextepisode(showname)
+        _nextepisode(showname)
     elif args.get('--mark-watched', False):
-        markwatched(showname, args['--mark-watched'], watched=True,
-                    markprevious=args.get('--mark-previous', False))
+        _markwatched(showname, args['--mark-watched'], watched=True,
+                     markprevious=args.get('--mark-previous', False))
     elif args.get('--mark-unwatched', False):
-        markwatched(showname, args['--mark-unwatched'], watched=False,
-                    markprevious=args.get('--mark-previous', False))
+        _markwatched(showname, args['--mark-unwatched'], watched=False,
+                     markprevious=args.get('--mark-previous', False))
     elif args.get('--download', False):
-        download(showname)
+        _download(showname)
     elif args.get('--update', False):
-        update(showname)
+        _update(showname)
     elif args.get('--rename', False) and args.get('<filename>', False):
-        rename(args['<filename>'])
+        _rename(args['<filename>'])
     else:
         print('Unimplemented/unknown arguments "{}".'.format(args))
 
 
-def watchnext(showname):
+def _watchnext(showname):
     episode = getnextepisode(showname)
     if episode is None:
         print("Couldn't find any new episodes!")
         if yesno("Would you like to update the cache?"):
-            update(showname)
-            watchnext(showname)  # this could be an endless loop.
+            _update(showname)
+            _watchnext(showname)  # this could be an endless loop.
         return
     if watchepisode(episode):
         markwatched(episode)
 
 
-def watch(showname, episodestring):
+def _watch(showname, episodestring):
     seasonnum, episodenum = getepisodeinfo(episodestring)
     assert(seasonnum is not None and episodenum is not None)
     episode = getepisode(showname, seasonnum, episodenum)
@@ -93,8 +93,8 @@ def watch(showname, episodestring):
         markwatched(episode)
 
 
-def nextepisode(showname):
-    logger.info("nextepisode")
+def _nextepisode(showname):
+    logger.info("_nextepisode")
     episode = getnextepisode(showname)
     if episode is None:
         print "No episode found!"
@@ -103,21 +103,21 @@ def nextepisode(showname):
                                                       date=episode.getairdatestr()).encode('utf8'))
 
 
-def markwatched(showname, episodestring, markprevious, watched):
+def _markwatched(showname, episodestring, markprevious, watched):
     logger.info("markwatched")
     seasonnum, episodenum = getepisodeinfo(episodestring)
     episode = getepisode(showname, seasonnum, episodenum)
     markwatched(episode, markprevious=markprevious, watched=watched)
 
 
-def download(showname):
+def _download(showname):
     logger.info("download")
     seasonnum, episodenum = getepisodeinfo(args['--download'])
     episode = getepisode(showname, seasonnum, episodenum)
     downloadepisode(episode)
 
 
-def rename(filenames):
+def _rename(filenames):
     logger.info("rename")
     # user didn't give an argument. he wants to run it on all files in folder.
     if filenames == []:
@@ -126,7 +126,7 @@ def rename(filenames):
         renameepisode(filename)
 
 
-def update(showname):
+def _update(showname):
     logger.info("update")
     print("Updating {name}..".format(name=showname))
     getshow(showname, update=True)
