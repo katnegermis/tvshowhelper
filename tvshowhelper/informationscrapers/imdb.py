@@ -77,8 +77,10 @@ def _getimdburl(showname):
     results = google.query("site:www.imdb.com {}".format(showname))
     result = results[0]
     if not showname in result:
-        askuser.yesno("Searched for '{a}', found {b}. "
-                      "Is this the right show?".format(a=showname, b=result['title']))
+        # show titles in google searches are sorrounded by "'s
+        foundshowname = result['title'].split('"')[1]
+        print("Searched for '{a}' on IMDB, found '{b}'.".format(a=showname,
+                                                                b=foundshowname))
         return None
     return results[0]['link']
 
