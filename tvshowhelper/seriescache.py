@@ -104,9 +104,9 @@ def markwatched(episode, markprevious=False, watched=True):
     """ Set the watched-attribute of one and/or all previous episodes of show.
 
     """
-    if not episodeexists(showname=episode.showname,
-                         seasonnum=episode.seasonnumber,
-                         episodenum=episode.number):
+    if not _episodeexists(showname=episode.showname,
+                          seasonnum=episode.seasonnumber,
+                          episodenum=episode.number):
         print "{ep} doesn't exist in database!".format(episode.getprettyname())
         return
     # Episode exists in DB.
@@ -164,7 +164,7 @@ def _getshowid(showname):
     return rows[0][0]
 
 
-def episodeexists(showname, seasonnum, episodenum):
+def _episodeexists(showname, seasonnum, episodenum):
     db = _getdbcon()
     c = db.cursor()
     sql = """
