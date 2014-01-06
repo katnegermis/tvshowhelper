@@ -124,7 +124,7 @@ class TestSeriesCache(unittest.TestCase):
         self.assertEquals(episode.seasonnumber, self.seasonnumber)
         self.assertEquals(episode.number, 0)
 
-        # We find the same episode since it hasn't been marked watched (Episode 0)
+        # We continue to find the same episode since it hasn't been marked watched (Episode 0)
         for __ in range(100):
             episode = seriescache.getnextepisode(self.showname)
             self.assertEquals(episode.seasonnumber, self.seasonnumber)
