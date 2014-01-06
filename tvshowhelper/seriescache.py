@@ -105,8 +105,8 @@ def markwatched(episode, markprevious=False, watched=True):
 
     """
     if not episodeexists(showname=episode.showname,
-                          seasonnum=episode.seasonnumber,
-                          episodenum=episode.number):
+                         seasonnum=episode.seasonnumber,
+                         episodenum=episode.number):
         print "{ep} doesn't exist in database!".format(episode.getprettyname())
         return
     # Episode exists in DB.
@@ -230,7 +230,7 @@ def _storeepisodes(showname, episodes):
     if not showexists(showname):
         show = imdb.getshow(showname)
         if show is None:
-            print "Couldn't find show on IMDB."
+            print("Couldn't find show on IMDB.")
             return
         _storeshow(show)
     showid = _getshowid(showname)
