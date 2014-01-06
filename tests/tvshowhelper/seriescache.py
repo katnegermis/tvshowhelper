@@ -145,16 +145,12 @@ class TestSeriesCache(unittest.TestCase):
 
         # We can mark episode watched
         seriescache.markwatched(episode, markprevious=False, watched=True)
-
-        # Episode has been marked watched
         episode = seriescache.getepisode(self.showname, seasonnum=self.seasonnumber,
                                          episodenum=epnum)
         self.assertTrue(episode.watched)
 
         # We can mark episode unwatched
         seriescache.markwatched(episode, markprevious=False, watched=False)
-
-        # Episode has been marked unwatched
         episode = seriescache.getepisode(self.showname, seasonnum=self.seasonnumber,
                                          episodenum=epnum)
         self.assertFalse(episode.watched)
