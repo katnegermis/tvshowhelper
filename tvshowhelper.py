@@ -40,7 +40,7 @@ from tvshowhelper.seriesdownloader import downloadepisode
 from tvshowhelper.seriesrenamer import renameepisode
 from tvshowhelper.askuser import yesno
 from tvshowhelper.logger import logger, setlevel as setlogginglevel
-from tvshowhelper.seriescache import getepisode, getnextepisode, markwatched
+from tvshowhelper.showcache import getepisode, getnextepisode, markwatched
 
 
 def main(args):

@@ -187,7 +187,7 @@ def _rowtoshow(row):
 
 def _rowtoepisode(showname, row):
     """ Convert a row from sqlite to an instance of Episode.
-    Assumes that 'row' is a listy type with episode information in the
+    Assumes that `row` is a listy type with episode information in the
     following order:
     [number, name, airdate, description, watched, seasonnumber]
 
@@ -202,7 +202,7 @@ def _rowtoepisode(showname, row):
 
 
 def _storeshow(show):
-    """ Store a show (instance of Show).
+    """ Store a show (instance of Show) in cache.
 
     """
     if show is None:
