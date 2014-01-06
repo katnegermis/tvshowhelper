@@ -100,23 +100,23 @@ class TestSeriesCache(unittest.TestCase):
 
     def test_episodeexists(self):
         # We can find show that exists.
-        self.assertTrue(seriescache.episodeexists(self.showname,
-                                                  seasonnum=self.seasonnumber,
-                                                  episodenum=0))
-        # We can't find episode that doesn't exist.
-        self.assertFalse(seriescache.episodeexists(self.showname,
+        self.assertTrue(seriescache._episodeexists(self.showname,
                                                    seasonnum=self.seasonnumber,
-                                                   episodenum=999))
+                                                   episodenum=0))
+        # We can't find episode that doesn't exist.
+        self.assertFalse(seriescache._episodeexists(self.showname,
+                                                    seasonnum=self.seasonnumber,
+                                                    episodenum=999))
 
         # We can't find episode in season that doesn't exist.
-        self.assertFalse(seriescache.episodeexists(self.showname,
-                                                   seasonnum=self.seasonnumber + 1,
-                                                   episodenum=0))
+        self.assertFalse(seriescache._episodeexists(self.showname,
+                                                    seasonnum=self.seasonnumber + 1,
+                                                    episodenum=0))
 
         # We can't find episode from show that doesn't exist.
-        self.assertFalse(seriescache.episodeexists("nonexistent show",
-                                                   seasonnum=self.seasonnumber,
-                                                   episodenum=999))
+        self.assertFalse(seriescache._episodeexists("nonexistent show",
+                                                    seasonnum=self.seasonnumber,
+                                                    episodenum=999))
 
     def test_getnextepisode(self):
         # We find first unwatched episode (Episode 0)
