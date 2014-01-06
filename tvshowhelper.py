@@ -51,6 +51,7 @@ def main(args):
         showname = getshowname(" ".join(args['<showname>']))
         logger.info("Showname: '{name}'".format(name=showname))
 
+    # Decide what function was requested.
     if args.get('--watch-next', False):
         _watchnext(showname)
     elif args.get('--watch', False):
