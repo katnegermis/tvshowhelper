@@ -86,7 +86,7 @@ class Testshowcache(unittest.TestCase):
         # We can find all episodes of the show we created.
         for epnum in range(len(self.episodes)):
             episode = showcache.getepisode(showname=self.showname, seasonnum=1,
-                                             episodenum=epnum)
+                                           episodenum=epnum)
             self.assertEquals(episode.seasonnumber, self.seasonnumber)
             self.assertEquals(episode.number, epnum)
             self.assertEquals(episode.showname, self.showname)
@@ -97,14 +97,14 @@ class Testshowcache(unittest.TestCase):
         """
         # We can't find an episode that doesn't exist.
         nonexistentepisode = showcache.getepisode(showname=self.showname,
-                                                    seasonnum=self.seasonnumber,
-                                                    episodenum=100)
+                                                  seasonnum=self.seasonnumber,
+                                                  episodenum=100)
         self.assertIsNone(nonexistentepisode)
 
         # We can't find an episode in a show that doesn't exist.
         nonexistentshow = showcache.getepisode(showname="no such show",
-                                                 seasonnum=self.seasonnumber,
-                                                 episodenum=0)
+                                               seasonnum=self.seasonnumber,
+                                               episodenum=0)
         self.assertIsNone(nonexistentshow)
 
     def test_showexists(self):
@@ -129,22 +129,22 @@ class Testshowcache(unittest.TestCase):
         """
         # We can find show that exists.
         self.assertTrue(showcache.episodeexists(self.showname,
-                                                  seasonnum=self.seasonnumber,
-                                                  episodenum=0))
+                                                seasonnum=self.seasonnumber,
+                                                episodenum=0))
         # We can't find episode that doesn't exist.
         self.assertFalse(showcache.episodeexists(self.showname,
-                                                   seasonnum=self.seasonnumber,
-                                                   episodenum=999))
+                                                 seasonnum=self.seasonnumber,
+                                                 episodenum=999))
 
         # We can't find episode in season that doesn't exist.
         self.assertFalse(showcache.episodeexists(self.showname,
-                                                   seasonnum=self.seasonnumber + 1,
-                                                   episodenum=0))
+                                                 seasonnum=self.seasonnumber + 1,
+                                                 episodenum=0))
 
         # We can't find episode from show that doesn't exist.
         self.assertFalse(showcache.episodeexists("nonexistent show",
-                                                   seasonnum=self.seasonnumber,
-                                                   episodenum=999))
+                                                 seasonnum=self.seasonnumber,
+                                                 episodenum=999))
 
     def test_getnextepisode_single_season(self):
         """ Verify that we get the first unwatched episode from the series.
@@ -191,7 +191,7 @@ class Testshowcache(unittest.TestCase):
 
         # We mark all episodes of the first season to be watched
         episode = showcache.getepisode(self.showname, seasonnum=1,
-                                         episodenum=len(self.episodes) - 1)
+                                       episodenum=len(self.episodes) - 1)
         showcache.markwatched(episode, markprevious=True, watched=True)
 
         # The first unwatched episode should now be episode 0 from season 2.
@@ -208,19 +208,19 @@ class Testshowcache(unittest.TestCase):
         epnum = 0
         # Episode is unwatched
         episode = showcache.getepisode(self.showname, seasonnum=self.seasonnumber,
-                                         episodenum=epnum)
+                                       episodenum=epnum)
         self.assertFalse(episode.watched)
 
         # We can mark episode watched
         showcache.markwatched(episode, markprevious=False, watched=True)
         episode = showcache.getepisode(self.showname, seasonnum=self.seasonnumber,
-                                         episodenum=epnum)
+                                       episodenum=epnum)
         self.assertTrue(episode.watched)
 
         # We can mark episode unwatched
         showcache.markwatched(episode, markprevious=False, watched=False)
         episode = showcache.getepisode(self.showname, seasonnum=self.seasonnumber,
-                                         episodenum=epnum)
+                                       episodenum=epnum)
         self.assertFalse(episode.watched)
 
     def test_markwatched_mark_previous(self):
@@ -232,24 +232,24 @@ class Testshowcache(unittest.TestCase):
         half = (len(self.episodes) - 1) // 2
         # Mark all episodes watched
         episode = showcache.getepisode(self.showname, seasonnum=self.seasonnumber,
-                                         episodenum=len(self.episodes) - 1)
+                                       episodenum=len(self.episodes) - 1)
         showcache.markwatched(episode, markprevious=True, watched=True)
 
         # Mark first half of episodes unwatched
         episode = showcache.getepisode(self.showname, seasonnum=self.seasonnumber,
-                                         episodenum=half)
+                                       episodenum=half)
         showcache.markwatched(episode, markprevious=True, watched=False)
 
         # First half is unwatched
         for epnum in range(half + 1):
             episode = showcache.getepisode(self.showname, seasonnum=self.seasonnumber,
-                                             episodenum=epnum)
+                                           episodenum=epnum)
             self.assertFalse(episode.watched)
 
         # Second half is watched
         for epnum in range(half + 1, len(self.episodes)):
             episode = showcache.getepisode(self.showname, seasonnum=self.seasonnumber,
-                                             episodenum=epnum)
+                                           episodenum=epnum)
             self.assertTrue(episode.watched)
 
 if __name__ == '__main__':
