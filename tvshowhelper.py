@@ -50,6 +50,10 @@ def main(args):
     logger.debug("Arguments: {args}".format(args=args))
     if args.get('<showname>', False):
         showname = getshowname(" ".join(args['<showname>']))
+        if showname is None:
+            print("Couldn't find a show by the name '{n}' "
+                  "in your regexes!".format(n=" ".join(args['<showname>'])))
+            return
         logger.info("Showname: '{name}'".format(name=showname))
 
     if args.get('--watch-next', False):
