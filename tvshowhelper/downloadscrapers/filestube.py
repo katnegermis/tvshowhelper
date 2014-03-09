@@ -45,7 +45,7 @@ class Filestube(LinkScraperInterface):
             return []
         html = response.text
         doc = lxml.html.fromstring(html)
-        results = doc.cssselect("div#newresult")
+        results = doc.cssselect("div.newresult")
         links = []
         for result in results:
             try:
@@ -68,7 +68,7 @@ class Filestube(LinkScraperInterface):
         doc = lxml.html.fromstring(html)
         links = doc.cssselect("pre#copy_paste_links")[0].text_content().strip("\"").strip().split()
         try:
-            title = doc.cssselect("div.dotter h1")[0].text_content()
+            title = doc.cssselect("div.file-heading h1")[0].text_content()
         except IndexError:
             logger.debug("div.dotter.h1 doesn't exist. Skipping..")
             return None
