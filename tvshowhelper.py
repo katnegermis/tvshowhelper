@@ -89,6 +89,7 @@ def watchnext(showname, cache):
         return
     if watchepisode(episode):
         cache.markwatched(episode)
+    askwatchnext(showname, cache)
 
 
 def watch(showname, cache, episodestring):
@@ -98,6 +99,7 @@ def watch(showname, cache, episodestring):
     episode = cache.getepisode(showname, seasonnum, episodenum)
     if watchepisode(episode):
         cache.markwatched(episode)
+    askwatchnext(showname, cache)
 
 
 def nextepisode(showname, cache):
@@ -141,6 +143,10 @@ def update(showname, cache):
     logger.info("update")
     print("Updating {name}..".format(name=showname))
     cache.getshow(showname, update=True)
+
+def askwatchnext(showname, cache):
+    if yesno("Would you like to watch the next episode?"):
+        watchnext(showname, cache)
 
 
 if __name__ == '__main__':
