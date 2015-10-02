@@ -16,6 +16,9 @@ SERIES_ROOT_FOLDER = "/home/katnegermis/downloads"
 """ Folder where series are downloaded to. """
 SERIES_DOWNLOAD_FOLDER = "/home/katnegermis/downloads"
 
+""" Folders to look for series files. """
+SERIES_SEARCH_FOLDERS = ('/media/katnegermis/server/downloads',)
+
 """ Should the download folder be searched for episodes to watch? """
 SEARCH_DOWNLOAD_FOLDER = True
 
@@ -35,7 +38,8 @@ SEASON_EPISODE_REGEX = re.compile("(s|se|season)(?P<season>\d{1,2})(e|ep|episode
 The user will be asked to choose from the list of matching regexes. """
 SEASON_EPISODE_REGEX_EXTRAS = (
     re.compile("((?P<season>\d{1,2})(?P<episode>\d{1,2}))(?!(p|mb))", re.IGNORECASE),
-    re.compile("((?P<season>\d)(?P<episode>\d{1,2}))(?!(p|mb))", re.IGNORECASE),
+    re.compile("((?P<season>\d)x?(?P<episode>\d{1,2}))(?!(p|mb))", re.IGNORECASE),
+    re.compile("episode.?(?P<episode>\d{1,2}).?series.?(?P<season>\d{1,2})", re.IGNORECASE),
 )
 
 DOWNLOADERS = (

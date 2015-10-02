@@ -1,7 +1,8 @@
 import os
 
 from settings import (SEASON_EPISODE_REGEX, SEASON_EPISODE_REGEX_EXTRAS, SERIES_ROOT_FOLDER,
-                      SERIES_DOWNLOAD_FOLDER, SEARCH_DOWNLOAD_FOLDER, MEDIA_EXTENSIONS)
+                      SERIES_DOWNLOAD_FOLDER, SEARCH_DOWNLOAD_FOLDER, MEDIA_EXTENSIONS,
+                      SERIES_SEARCH_FOLDERS)
 from settings.regexes import SERIES_REGEXES
 import askuser
 
@@ -46,10 +47,11 @@ def getshowname(txt):
 def getepisodepath(showname, episode):
     showpath = os.path.join(SERIES_ROOT_FOLDER, showname)
 
-    searchdirs = [showpath]
+    searchdirs = [showpath] + list(SERIES_SEARCH_FOLDERS)
     if SEARCH_DOWNLOAD_FOLDER:
         searchdirs.append(SERIES_DOWNLOAD_FOLDER)
     for searchdir in searchdirs:
+        print searchdir
         if not os.path.exists(searchdir):
             continue
         for filename in os.listdir(searchdir):
