@@ -1,11 +1,11 @@
 from tvshowhelper.classes.regex import Regex
 
 SERIES_REGEXES = (
+    Regex(showname="The Sopranos",
+          regex="(the\s*)?sopranos"),
+
     Regex(showname="The Big Bang Theory",
           regex="((the.*)?big.?bang.?theory|T.?B.?B.?T|t.?b.?t[^a-z])"),
-
-    Regex(showname="House M.D.",
-          regex="(house(.?md)?|hse[^a-z]|h0u53|h.?s.?e.?[^a-z])"),
 
     Regex(showname="Two and a Half Men",
           regex="((two|2).?and.?a.?half.?men|t.?(a.)?a.?h.?m)"),
@@ -139,9 +139,6 @@ SERIES_REGEXES = (
     Regex(showname="Skins",
           regex="skins"),
 
-    Regex(showname="Suits",
-          regex="(sts[^a-z]|suits)"),
-
     Regex(showname="Dragon Ball Z",
           regex="(dbz|dragon ball z)"),
 
@@ -216,4 +213,10 @@ SERIES_REGEXES = (
 
     Regex(showname="Peep Show",
           regex="p(eep)?.?show"),
+
+    Regex(showname="The Office",
+          regex="the.?office"),
+
+    Regex(showname="True Detective",
+          regex="true.?detective"),
 )
