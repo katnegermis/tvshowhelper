@@ -11,7 +11,7 @@ from tvshowhelper.parallel import parallel_map
 
 class Filestube(LinkScraperInterface):
     _BASE_URL = "http://www.filestube.com/"
-    _LIST_URL = (_BASE_URL + "query.html?q={query}&select=All&hosting=24,81&"
+    _LIST_URL = (_BASE_URL + "query.html?q={query}&select=All&hosting=11,24,81&"
                  "page={{pageid}}&sizefrom={sizefrom}&sizeto={sizeto}")
     _LINKS_PER_PAGE = 10
     _NUM_PAGES_SCRAPED = 3
@@ -66,8 +66,8 @@ class Filestube(LinkScraperInterface):
         html = response.text
         logger.debug("Getting filehost links")
         doc = lxml.html.fromstring(html)
-        links = doc.cssselect("pre#copy_paste_links")[0].text_content().strip("\"").strip().split()
         try:
+            links = doc.cssselect("pre#copy_paste_links")[0].text_content().strip("\"").strip().split()
             title = doc.cssselect("div.file-heading h1")[0].text_content()
         except IndexError:
             logger.debug("div.dotter.h1 doesn't exist. Skipping..")

@@ -22,6 +22,7 @@ class Jdownloader(DownloaderInterface):
             requests.get(url)
         except requests.exceptions.ConnectionError:
             print("JDownloader doesn't seem to be running. Please open it and try again!")
+            print("The link is: {l}".format(l=link))
 
     def _running(self):
         p = Popen(["ps", "-A"], stdout=PIPE)
